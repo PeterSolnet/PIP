@@ -1,0 +1,261 @@
+﻿@using K2.WebApi.Models
+@model dynamic
+
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/themes/base/selectable.css" rel="stylesheet" />
+<link href="~/Content/themes/base/autocomplete.css" rel="stylesheet" />
+<link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.semanticui.min.css" rel="stylesheet" />
+<section id="home">
+
+    <div class="container">
+        <div class="main-content">
+
+
+            <div>
+
+                <div class="sub-green col-xs-12 mt20">
+                    <h4>Road Map Concept Form</h4>
+                </div>
+
+
+                <div class="col-xs-12 info">
+                    @Html.Partial("~/Views/RoadMap/PartialUpdate.cshtml")
+
+                    <div class="newRoadMap">
+                        @using (Html.BeginForm("CreateRoadMap", "RoadMap", FormMethod.Post, new { id = "roadMapForm" }))
+                        {
+                           <p class="col-md-3 col-xs-12">
+                            <label>Concept Owner</label><br>
+                            <select class="form-control chosen-select" id="ConceptOwner" name="ConceptOwner" data-placeholder="Select User ..">
+                                @{
+                                    var adUserList2 = new List<ADModel>();
+                                    if (TempData["aduserList"] != null)
+                                    {
+                                        adUserList2 = (List<ADModel>)TempData["aduserList"];
+                                    }
+                                    foreach (var item in adUserList2)
+                                    {
+                                        <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                                    }
+                                }
+                            </select>
+                        </p>
+
+                            <p class="col-md-3 col-xs-12">
+                                <label>Concept Name</label><br>
+                                <input type="text" class="form-control" placeholder="Concept Name" id="ConceptName" name="ConceptName" required>
+                            </p>
+
+                            <p class="col-md-4 col-xs-12">
+                                <label>Road Map</label><br>
+                                <select class="form-control chosen-select" id="RoadMapMasterId" name="RoadMapMasterId" data-placeholder="Select Road Map ..">
+                                    @{
+                                        var newroadMapMasterList = new List<RoadMapMaster>();
+                                        if (TempData["newroadMapMasterList"] != null)
+                                        {
+                                            newroadMapMasterList = (List<RoadMapMaster>) TempData["newroadMapMasterList"];
+                                        }
+                                        foreach (var item in newroadMapMasterList)
+                                        {
+
+                                            <option value="@item.Id">@item.RoadMapName</option>
+                                        }
+                                    }
+                                </select>
+
+                            </p>
+                                    
+                                    
+                            <div class="row">
+                                <div class="col-xs-12 form-group">
+                                    <button type="submit" class="btn btn-success col-md-offset-1 col-md-2 col-xs-12 mr10">CANCEL</button>
+                                    <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitFrm">SUBMIT</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <p></p>
+
+                    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                        
+                        <table class="table" style="border: 0; height: auto;" id="datagrid">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>RoadMapMasterId</th>
+                                <th>Road Map Name</th>
+                                <th>Concept Name</th>
+                                <th>Concept Owner</th>
+
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+
+                                var roadMapLists = new List<RoadMapViewModel>();
+
+                                roadMapLists = (List<RoadMapViewModel>)TempData["roadMapLists"];
+
+                                if (roadMapLists != null)
+                                {
+                                    foreach (var item in roadMapLists)
+                                    {
+                                        <tr>
+                                            <td>@item.Id</td>
+                                            <td>@item.RoadMapMasterId</td>
+                                            <td>@item.RoadMapName</td>
+                                            <td>@item.ConceptName</td>
+                                            <td>@item.ConceptOwner</td>
+
+
+                                            <td><a class="update" href="#">Edit</a></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {<text>No Record Found</text>
+                                }
+
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+</section>
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/sweetalert.min.js"></script>
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.bootstrap.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.buttons.min.js"></script>
+
+<script src="~/Content/chosen/chosen.jquery.min.js"></script>
+<script src="~/Content/chosen/chosen.proto.min.js"></script>
+<script>
+    $(function () {
+
+        $('#datagrid').DataTable();
+
+        $("#submitFrm").css("display", "block");
+        $("#updateFrm").css("display", "none");
+        $(".newRoadMap").css("display", "block");
+        $(".updateRoadMap").css("display", "none");
+
+        $("#StartDate, #EndDate, #updateStartDate, #updateEndDate").datepicker({
+            dateFormat: 'dd-M-yy'
+        });
+
+        $('#roadMasterForm').submit(function () {
+            $('#submitFrm').attr('disabled', 'disabled');
+
+            $.ajax({
+                type: this.method,
+                url: this.action,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.s != null) {
+                        swal(result.s, "", "success");
+                        $('#submitFrm').removeAttr('disabled');
+                        top.location.href = "/RoadMapMaster";
+                    }
+                    else if (result.f != null) {
+                        $('#submitFrm').removeAttr('disabled');
+                        swal(result.f, "", "error");
+                        top.location.href = "/RoadMap";
+                    }
+                }
+            });
+
+            return false;
+
+            //var addRow = "<tr><td><input type='checkbox' name='record'></td><td>" + roadMapName_ + "</td><td>" + startDate_ + "</td><td>" + endDate_ + "</td><td><a class='update' href='#'>Edit</a></td></tr>";
+            //$("table tbody").append(addRow);
+            //$("#roadMapName").val("");
+            //$("#startDate").val("");
+            //$("#endDate").val("");
+            //compact();
+            //document.location.href = "/";
+        });
+        //var rid = 0;
+
+        $(".update").click(function () {
+            var tableEditRow = $('#datagrid tr').eq($('#datagrid tr').index($(this).parents('tr')));
+
+
+            $('#UpdateRoadMapMasterId').val(tableEditRow.children("td").eq(1).html());
+
+           // $('#UpdateRoadMapMasterId').attr('selected', 'selected');
+            //$('#RoadMapMasterId').val(tableEditRow.children("td").eq(2).html());
+            var selectValue = tableEditRow.children("td").eq(1).html();
+            $('#UpdateRoadMapMasterId').each(function () {
+                if ($(this).val() === selectValue) {
+                    $(this).prop("selected", true);
+                }
+            });
+
+
+
+            $('#UpdateConceptName').val(tableEditRow.children("td").eq(3).html());
+            $('#UpdateConceptOwner').val(tableEditRow.children("td").eq(4).html());
+
+            $('#Id').val(tableEditRow.children("td").eq(0).html());
+            $("#submitFrm").css("display", "none");
+            $("#updateFrm").css("display", "block");
+
+            $(".newRoadMap").css("display", "none");
+            $(".updateRoadMap").css("display", "block");
+        });
+
+
+        // Find and remove selected table rows
+        $('#roadFormUpdate').submit(function () {
+            $(".updateRoadMap").attr('disabled', 'disabled');
+            $.ajax({
+                type: this.method,
+                url: this.action,
+                data: $(this).serialize(),
+                dataType: 'json',
+
+                success: function (result) {
+                    if (result.f != null) {
+                        $('.updateRoadMap').removeAttr('disabled');
+                        swal(result.f, "", "error");
+
+                    } else if (result.s != null) {
+                        $('.updateRoadMap').removeAttr('disabled');
+                        swal(result.s, "", "success");
+                        top.location.href = "/RoadMap";
+                    }
+
+                }
+            });
+            return false;
+        });
+
+        //$(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+    });
+</script>
+
+

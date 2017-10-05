@@ -1,0 +1,182 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model dynamic
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //var theId = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 12);
+    //var theId = "882a0447e998";
+}
+
+
+
+<section id="home">
+                <div class="green-header"><h4>BRD Stage Initiation Page</h4></div>
+
+    <div class="container">
+        <div class="main-content">
+
+
+            <div>
+
+                @using (Html.BeginForm("CreateBrd", "Product", FormMethod.Post, new { id = "brdFrm", role = "form" }))
+                {
+
+
+                    <div class="col-xs-12 info" style="margin-top: 5px;">
+                        <p class="col-md-4 col-xs-12"></p>
+                        <input type="hidden" value="BRD" id="tag" name="tag"/> 
+                        <input type="hidden" id="requestId" name="requestId" value=""/>
+
+
+                    </div>
+
+                    <div class="sub-green col-xs-12 mt20">
+                            <h4 class="pull-left">Production Implementation Timelines</h4>
+                            <i class="fa fa-chevron-up pull-right pt10"></i>
+                            </div>
+                    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                        <table class="table" style="border: 0; height: auto;" id="datagrid">
+                            <thead>
+                            <tr>
+                                <th  class="hide">ID</th>
+                                <th>Tag</th>
+                                <th>Initiator</th>
+                                <th>Status</th>
+                                <th>Date Paused</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                                        @{
+                    var pim = new List<PauseInfo>();
+                    if (TempData["pauseInfoList"] != null)
+                    {
+                        pim = (List<PauseInfo>)TempData["pauseInfoList"];
+
+
+                    }
+
+                    foreach (var item in pim)
+                    {
+                                <tr>
+                                    <td class="hide">@item.Id</td>
+                                    <td>@item.Tag</td>
+                                    <td>@item.Actor</td>
+                                    <td>@item.Status</td>
+                                    <td>@item.DatePaused.ToString("dd MMM \\'yy")</td>
+                                    <td><button style=""  type="button" class="btn btn-info resume">Resume</button></td>
+                                </tr>
+
+
+                    }
+
+
+                        }
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="col-xs-12 form-group" style="margin-top:20px; float:right;">
+                    </div>
+
+                }
+            </div>
+           
+        </div>
+    </div>
+
+</section>
+<script>
+    function ShowDocumentDiv() {
+        //alert("Boo");
+        var documentDiv = document.getElementById('documentDiv');
+        var documentSelect = document.getElementById('documentTypeId_chosen');
+
+        documentDiv.style.display = "inline";
+        documentSelect.style.width = '120px';
+        //document.getElementById("buttonNext").setAttribute('disabled', true);
+
+    }
+
+
+    $(function() {
+        $('#brdFrm').submit(function() {
+            //alert("Booo");
+            var fields = $(this).serializeArray();
+            var activities = compact();
+            fields.push({ name: 'Activities', value: JSON.stringify(activities)});
+            $.ajax({              
+                url: this.action,
+                type: this.method,
+                data: fields,
+                success: function(result) {
+                    //debugger;
+
+                    if (result.f != null) {
+
+                        swal(result.f, "!", "error");
+
+                    } else {
+
+
+                        swal({
+                            title: "Success!",
+                            text: result.s,
+                            type: "success"
+                        });
+
+                        ShowDocumentDiv();
+                    }
+
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+
+
+
+
+
+<script>
+
+    $("#datepicker, #st,#stp").datepicker();
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+
+ 
+   
+        $(".resume").click(function () {
+            $cells = $(this).closest("tr").children('td.hide').text();
+                $.ajax({
+                    url: '/Activities/Update?pauseRef=' + $cells,
+                    type: "POST",
+                    //data: fields,
+                    success: function (result) {
+
+                        if (result.f != null) {
+
+                            swal(result.f, "!", "error");
+
+                        } else {
+
+
+                            swal({
+                                title: "Success!",
+                                text: result.s,
+                                type: "success"
+                            });
+
+                        }
+
+                    }
+                });
+
+                return false;
+            }); 
+</script>

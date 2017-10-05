@@ -837,6 +837,13 @@
     <Content Include="Views\Product\BRDStatusUpdate.cshtml" />
     <Content Include="Views\PauseState\Index.cshtml" />
     <Content Include="Views\Implementation\Index.cshtml" />
+    <Content Include="Views\Implementation\ImplementerDisplay.cshtml" />
+    <Content Include="Views\Implementation\implapproval.cshtml" />
+    <Content Include="Views\Implementation\implUpdate.cshtml" />
+    <Content Include="Views\RoadMap\Index.cshtml" />
+    <Content Include="Views\RoadMap\PartialUpdate.cshtml" />
+    <Content Include="Views\RoadMapMaster\Index.cshtml" />
+    <Content Include="Views\RoadMapMaster\PartialUpdate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

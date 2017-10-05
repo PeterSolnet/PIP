@@ -22,6 +22,7 @@ namespace K2.WebApi.Controllers
         {
             return db.RoadMaps;
         }
+
         [ResponseType(typeof(RoadMap))]
         public async Task<IHttpActionResult> GetRoadMap(long id)
         {
@@ -92,11 +93,23 @@ namespace K2.WebApi.Controllers
 
             return CreatedAtRoute("DefaultApi", new { id = roadMap.Id }, roadMap);
         }
-        [System.Web.Http.Route("api/RoadMapsApi/{roadMapMasterId}/master")]
-        public async Task<List<RoadMap>> GetRoadMapInfoListByMasterId(long roadMapMasterId)
+
+
+        //Get Specific Road Maps
+        [System.Web.Http.Route("api/RoadMapsApi/{master}/master")]
+        public async Task<List<RoadMap>> GetRoadMapListInfoByMasterId(long master)
         {
-            var roadMapList = await db.RoadMaps.Where(x => x.RoadMapMasterId == roadMapMasterId).ToListAsync();
+            var roadMapList = await db.RoadMaps.Where(x => x.RoadMapMasterId == master).ToListAsync();
             return roadMapList;
         }
+
+       
+
+        //[System.Web.Http.Route("api/GetRoadMapMasterByIdApi/{id}/id")]
+        //public async Task<RoadMapMaster> GetRoadMapMasterListInfoByIfd(long id)
+        //{
+        //    var roadMapList = await db.RoadMapMasters.Include(r => r.Id == id).ToListAsync();
+        //    return roadMapList;
+        //}
     }
 }

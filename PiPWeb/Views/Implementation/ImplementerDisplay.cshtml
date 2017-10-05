@@ -171,52 +171,85 @@
             </thead>
             <tbody>
             @{
-                
-                            var brdprodImplTimeline = new List<ImplementationTimeline>();
-                            if (TempData["BrdprodImplTimelineList"] != null)
-                            {
-                                brdprodImplTimeline = (List<ImplementationTimeline>)TempData["BrdprodImplTimelineList"];
 
-                                foreach (var item in brdprodImplTimeline)
-                                {
-                                                <tr>
-                                                    <td class="hide id">@item.Id</td>
-                                                    <td class="hide">@item.ImplementationInfoId</td>
-                                                    <td><input name='record' type="radio" disabled></td>
-                                                    <td>@item.ActivityName</td>
-                                                    <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
-                                                    <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
-                                                </tr>
-                                }
-                            }
+                var brdprodImplTimeline = new List<ImplementationTimeline>();
+                if (TempData["BrdprodImplTimelineList"] != null)
+                {
+                    brdprodImplTimeline = (List<ImplementationTimeline>) TempData["BrdprodImplTimelineList"];
 
-                            var prodImplTimeline = new List<ImplementationTimeline>();
-                            if (TempData["prodImplTimelineList"] != null)
-                            {
-                                prodImplTimeline = (List<ImplementationTimeline>)TempData["prodImplTimelineList"];
+                    foreach (var item in brdprodImplTimeline)
+                    {
+                        <tr>
+                            <td class="hide id">@item.Id</td>
+                            <td class="hide">@item.ImplementationInfoId</td>
+                            <td><input name='record' type="radio" disabled></td>
+                            <td>@item.ActivityName</td>
+                            <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                }
 
-                                foreach (var item in prodImplTimeline)
-                                {
-                                                <tr>
-                                                    <td class="hide id">@item.Id</td>
-                                                    <td class="hide">@item.ImplementationInfoId</td>
-                                                    <td><input name='record' type="radio" disabled></td>
-                                                    <td>@item.ActivityName</td>
-                                                    <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
-                                                    <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
-                                                </tr>
-                                }
-                            }
+                var prodImplTimeline = new List<ImplementationTimeline>();
+                if (TempData["prodImplTimelineList"] != null)
+                {
+                    prodImplTimeline = (List<ImplementationTimeline>) TempData["prodImplTimelineList"];
+
+                    foreach (var item in prodImplTimeline)
+                    {
+                        <tr>
+                            <td class="hide id">@item.Id</td>
+                            <td class="hide">@item.ImplementationInfoId</td>
+                            <td><input name='record' type="radio" disabled></td>
+                            <td>@item.ActivityName</td>
+                            <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                }
 
             }
             </tbody>
         </table>
+
+                    <p class="col-md-3 col-xs-12">
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <select class="form-control chosen-select" id="ac"  data-placeholder="Select Activity ..">
+                    @{
+                        var activityInfoList = new List<ActivityInfo>();
+                        if (TempData["activityInfoList"] != null)
+                        {
+                            activityInfoList = (List<ActivityInfo>)TempData["activityInfoList"];
+                             foreach (var item in activityInfoList)
+                                {
+                                   <option value="@item.Id">@item.ActivityName</option>
+                                }
+                        }
+                       
+                    }
+                </select>
+               @* <input type="text" class="form-control" placeholder="Activities" id="ac">*@
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <input type="text" class="form-control" placeholder="Start Date" id="st">
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <input type="text" class="form-control" placeholder="Stop Date" id="stp">
+            </p>
+
+            <div class="form-group col-xs-12 mt20">
+                <button type="button" class="btn btn btn-success col-md-1 mr20 col-xs-12 add-row">Add</button>
+                <button type="button" class="btn btn-danger col-md-1 col-xs-12 delete-row">Remove</button>
+
+            </div>
     </div>
-    
-        <div class="sub-green col-xs-12 mt20">
+
+    <div class="sub-green col-xs-12 mt20">
         <h4 class="pull-left">Action History</h4>
         <i class="fa fa-chevron-up pull-right pt10"></i>
     </div>
+    
     <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
         <table class="table" style="border: 0; height: auto;">
             <thead>
@@ -261,76 +294,32 @@
         <h4 class="pull-left">Workflow Approver's Action</h4>
         <i class="fa fa-chevron-up pull-right pt10"></i>
     </div>
-        <div class="col-xs-12 info">
-             <div class="form-group col-md-3 col-xs-12 approverAction">
-                <label>Select Action</label>
-                @{
-                    if (TempData["K2ActionName"] != null)
-                    {
-                        var actionName = (List<string>) TempData["K2ActionName"];
+    
+    <div class="col-xs-12 info">
+        <div class="form-group col-md-3 col-xs-12 approverAction">
+            <label>Select Action</label>
+            @{
+                if (TempData["K2ActionName"] != null)
+                {
+                    var actionName = (List<string>) TempData["K2ActionName"];
 
-                        <select id="ApprovalAction" name="approvalAction" class="col-xs-12 chosen-select">
-                            <option value="">Select an Action</option>
-                            @foreach (var item in actionName)
-                            {
-                                <option value="@item">@item</option>
-                            }
-                        </select>
-                    }
+                    <select id="ApprovalAction" name="approvalAction" class="col-xs-12 chosen-select">
+                        <option value="">Select an Action</option>
+                        @foreach (var item in actionName)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
                 }
-            </div>
-
-             <div class="col-md-3 form-group col-xs-12 taskAsssignedTo">
-                <label>Task Assigned To</label><br>
-               <select class="chosen-select" id="taskAsssignedTo" name="taskAsssignedTo" data-placeholder="Select User ..">
-                   @{
-                      var adUserList = new List<ADModel>();
-                      if (TempData["aduserList"] != null)
-                      {
-                           adUserList = (List<ADModel>) TempData["aduserList"];
-                          foreach (var item in adUserList)
-                          {
-                            <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
-                          }
-                      }
-                          
-                     }
-              </select>
-            </div>
-
-             <div class="col-md-3 form-group col-xs-12 taskPriority">
-            
-                <label>Priority Level</label><br>
-                <select class="chosen-select col-xs-12" name="taskPriority" id="taskPriority">
-                    <option value="High">High</option>
-                    <option value="Low">Low</option>
-                    <option value="Normal">Normal</option>
-                </select>
-            </div>
-
-             <div class="col-md-3 form-group col-xs-12 slaCategory">
-                            <label>SLA Category</label><br>
-                            <select class="col-xs-12 chosen-select" name="slaCategory" id="slaCategory">
-                                @{
-                        var slaCategoryList = new List<SlaCategory>();
-                                    if (TempData["slaCategoryList"] != null)
-                                    {
-                                        slaCategoryList = (List<SlaCategory>) TempData["slaCategoryList"];
-
-                                        foreach (var item in slaCategoryList)
-                                        {
-
-                                            <option value="@item.Id">@item.Category</option>
-                                        }
-                                    }
-                                }
-                            </select>
-                        </div>
-            <p class="col-xs-12">Comments</p>
-            <div class="form-group col-xs-12 col-md-4">
-                <textarea id="approverComment" name="approverComment" rows="5" class="form-control col-md-3 col-xs-12"></textarea>
-            </div>
+            }
         </div>
+
+        <p class="col-xs-12">Comments</p>
+        <div class="form-group col-xs-12 col-md-4">
+            <textarea id="approverComment" name="approverComment" rows="5" class="form-control col-md-3 col-xs-12"></textarea>
+        </div>
+    </div>
+    
     <div class="col-xs-12 form-group">
         <div id="cancel" class="btn btn-primary col-md-offset-5 col-md-2 col-xs-12 mr10">CANCEL</div>
         <button type="submit" id="submitBtn" name="submitBtn" class="btn btn-primary col-md-2 col-xs-12">SUBMIT</button>
@@ -343,41 +332,14 @@
 <script>
     $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
     $(document).ready(function () {
-        $(".taskPriority").hide();
-        $(".slaCategory").hide();
-        $(".taskAsssignedTo").hide();
-        $("#approverComment").removeAttr("required", true);
-
+        $("#st,#stp").datepicker();
         $(".approverAction").on('change', function () {
             var selectedOption = $(this).find(":selected");
-            if (selectedOption.val() === "Assign") {
-                $(".taskPriority").show();
-                $(".slaCategory").show();
-                $(".taskAsssignedTo").show();
-
-                $("#approverComment").removeAttr("required", true);
-                $(".taskPriority").prop("required", true);
-                $(".slaCategory").prop("required", true);
-                $(".taskAsssignedTo").prop("required", true);
-
-            } else {
-                $(".taskPriority").hide();
-                $(".slaCategory").hide();
-                $(".taskAsssignedTo").hide();
-
-                $("#approverComment").removeAttr("required", true);
-                $(".taskPriority").removeAttr("required", true);
-                $(".slaCategory").removeAttr("required", true);
-                $(".taskAsssignedTo").removeAttr("required", true);
-            }
             
-            if (selectedOption.val() === "Reject") {
-                $("#approverComment").prop("required", true);
-            }
         });
 
         $("#SubmitAcceptReject").submit(function () {
-            if ($(".approverAction option:selected").val() === "Assign") {
+          
                 $.ajax({
                     url: this.action,
                     type: this.method,
@@ -393,31 +355,60 @@
 
                 });
                 return false;
-            }
-            if ($(".approverAction option:selected").val() === "Reject") {
-                $.ajax({
-                    url: this.action,
-                    type: this.method,
-                    data: $(this).serialize(),
-                    success: function (result) {
-
-                        if (result.f != null) {
-                            swal(result.f, "", "error");
-                        } else {
-                            swal(result.s, "", "success");
-                        }
-                    }
-
-                });
-                return false;
-            } else {
-                swal({
-                    title: 'Wrong Action Selected',
-                    text: "You need to select an action to be performed!",
-                    type: 'warning'});
-            }
-            return false;
+           
         });
+
+        $(".add-row").click(function () {
+
+            $(".add-row").attr("disabled", "disabled");
+            var impelemetInfoId = $('#datagrid tr:last-child td:nth-child(2)').html();
+
+
+            var activity = $("#ac option:selected").text();
+            var activityId = $("#ac option:selected").val();
+
+            if (activity === "" || $("#st").val() === "" || $("#stp").val() === "") {
+                swal("One or more fields is empty!", "Empty Field(s)", "error");
+                $(".add-row").removeAttr("disabled");
+                return false;
+            }
+            var start = new Date($("#st").val());
+
+            var stop = new Date($("#stp").val());
+            if (start > stop) {
+                swal("End date cannot be earlier than Start date", "Invalid Date Enrty", "error");
+                $(".add-row").removeAttr("disabled");
+                return false;
+            }
+
+            var timelineData = JSON.stringify({ ActivityName: activity, ActivityId: activityId, TimeLineStartDate: start, TimeLineEndDate: stop, RequestId: $("#requestId").val(), ImplementationInfoId: impelemetInfoId });
+            $.ajax({
+                type: "POST",
+                url: 'Implementation/AddNewImplimentationTimeLine',
+                dataType: "json",
+                data: timelineData,
+                contentType: 'application/json, charset=utf-8',
+                processData: false,
+                success: function (result) {
+                    if (result.f !== undefined) {
+                        swal(result.f, "!", "error");
+                        // $(".add-row").prop("disabled", false);
+                    }
+                    else if (result.s !== undefined) {
+                        var markup = "<tr><td class='hide id'>" + result.id + "</td><td class='hide'>" + impelemetInfoId + "</td><td><input  type='radio' name='record'></td><td>" + activity + "</td><td>" + $("#st").val() + "</td><td>" + $("#stp").val() + "</td></tr>";
+                        $("#datagrid tbody").append(markup);
+                        compact();
+                        $('#ac').prop('selectedIndex', 0);
+                        $("#st").val('');
+                        $("#stp").val('');
+                        //$(".add-row").prop("disabled", false);
+                    }
+                }
+            });
+
+            $(".add-row").removeAttr("disabled");
+        });
+
     });
 
 </script>

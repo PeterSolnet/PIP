@@ -1,0 +1,56 @@
+﻿@using K2.WebApi.Models
+@model K2.WebApi.Models.RoadMapMaster
+<div class="updateRoadMap">
+    @using (Html.BeginForm("UpdateRoadMap", "RoadMap", FormMethod.Post, new { id = "roadFormUpdate" }))
+    {
+        <p class="col-md-3 col-xs-12">
+            <label>Concept Owner</label><br>
+            <select class="form-control chosen-select" id="UpdateConceptOwner" name="ConceptOwner" data-placeholder="Select User ..">
+                @{
+                    var adUserList2 = new List<ADModel>();
+                    if (TempData["aduserList"] != null)
+                    {
+                        adUserList2 = (List<ADModel>) TempData["aduserList"];
+                    }
+                    foreach (var item in adUserList2)
+                    {
+                        <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                    }
+                }
+            </select>
+        </p>
+        <p class="col-md-3 col-xs-12">
+            <input type="hidden" id="Id" name="Id"/>
+            <label>Concept Name</label><br>
+            <input type="text" class="form-control" placeholder="Road Map Name" id="UpdateConceptName" name="ConceptName" required>
+        </p>
+        <p class="col-md-4 col-xs-12">
+            <label>Road Map</label><br>
+            <select class="form-control chosen-select" id="UpdateRoadMapMasterId" name="RoadMapMasterId" data-placeholder="Select Road Map .." style="width: 200px">
+                @{
+                    var newroadMapMasterList = new List<RoadMapMaster>();
+                    if (TempData["newroadMapMasterList"] != null)
+                    {
+                        newroadMapMasterList = (List<RoadMapMaster>)TempData["newroadMapMasterList"];
+                    }
+                    foreach (var item in newroadMapMasterList)
+                    {
+                        <option value="@item.Id">@item.RoadMapName</option>
+                    }
+                }
+            </select>
+
+        </p>
+        
+        <div class="col-xs-12 form-group">
+            <button type="submit" class="btn btn-success col-md-offset-1 col-md-2 col-xs-12 mr10">CANCEL</button>
+            <button type="submit" class="btn btn-success col-md-2 col-xs-12" id="updateFrm">Update</button>
+        </div>
+    }
+</div>
+<script>
+    $(function () {
+ $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+    });
+</script>

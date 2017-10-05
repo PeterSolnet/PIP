@@ -387,7 +387,6 @@ namespace PiPWeb.Controllers
             return Json(new { s = "BRD Drafting Submitted Successfully!" });
         }
         
-        
         [Authorize]
         public async Task<ActionResult> BRDStatusUpdate(string SN)
         {
@@ -811,7 +810,7 @@ namespace PiPWeb.Controllers
                 {
                     var slaCategoryInfoList = await productService.GetSlaCategoryList();
                     var slaCategoryList = slaCategoryInfoList.Where(x => x.SlaLevel == tag).ToList();
-                    log.Info("Found " + slaCategoryList.Count);
+                    
                     TempData.Keep("slaCategoryList");
                     TempData["slaCategoryList"] = slaCategoryList;
                     connection.Open("localhost");

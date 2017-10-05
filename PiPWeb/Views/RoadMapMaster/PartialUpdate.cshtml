@@ -1,0 +1,22 @@
+﻿@model K2.WebApi.Models.RoadMapMaster
+<div class="updateRoadMap">
+    @using (Html.BeginForm("UpdateRoadMapMaster", "RoadMapMaster", FormMethod.Post, new { id = "roadMasterFormUpdate" }))
+    {
+        <p class="col-md-3 col-xs-12"></p>
+        <p class="col-md-3 col-xs-12">
+            <input type="text" id="Id" name="Id" />
+            <input type="text" class="form-control" placeholder="Road Map Name" id="updateRoadMapName" name="RoadMapName" required>
+        </p>
+        <p class="col-md-3 col-xs-12">
+            <input type="text" class="form-control" placeholder="start Date" id="updateStartDate" name="StartDate" required>
+        </p>
+        <p class="col-md-3 col-xs-12">
+            <input type="text" class="form-control" placeholder="End Date" id="updateEndDate" name="EndDate" required>
+        </p>
+        
+        <div class="col-xs-12 form-group">
+                <button type="submit" class="btn btn-success col-md-offset-1 col-md-2 col-xs-12 mr10">CANCEL</button>
+                <button type="submit" class="btn btn-success col-md-2 col-xs-12" id="updateFrm">Update</button>
+       </div>
+    }
+</div>

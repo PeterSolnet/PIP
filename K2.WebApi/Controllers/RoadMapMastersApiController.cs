@@ -61,6 +61,7 @@ namespace K2.WebApi.Controllers
             }
 
             db.Entry(roadMapMaster).State = EntityState.Modified;
+            
 
             try
             {
@@ -80,7 +81,7 @@ namespace K2.WebApi.Controllers
 
         // POST:
         [ResponseType(typeof(RoadMapMaster))]
-        public async Task<IHttpActionResult> PostProdImplTimeline(RoadMapMaster roadMapMaster)
+        public async Task<IHttpActionResult> PostRoadMapMaster(RoadMapMaster roadMapMaster)
         {
             if (!ModelState.IsValid)
             {
@@ -92,6 +93,7 @@ namespace K2.WebApi.Controllers
 
             return CreatedAtRoute("DefaultApi", new { id = roadMapMaster.Id }, roadMapMaster);
         }
+
         [System.Web.Http.Route("api/RoadMapMastersApi/{id}/RoadMapMasterInfoByRoadMapMasterId")]
         public async Task<RoadMapMaster> GetRoadMapMasterInfoById(long id)
         {
