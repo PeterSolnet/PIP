@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="CoreDeploy">
+  <PropertyGroup>
+    <Deploy_Processes>True</Deploy_Processes>
+    <Create_Notifications>True</Create_Notifications>
+    <Create_Workflow_SmartObjects>True</Create_Workflow_SmartObjects>
+    <Create_Workflow_Reporting_SmartObjects>True</Create_Workflow_Reporting_SmartObjects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TestOnly Condition="$(TestOnly) == ''">False</TestOnly>
+    <Environment Condition="$(Environment) == ''">Development</Environment>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Environment) == 'Development'">
+    <EnvironmentFields>
+      <Root Name="Development" xmlns="">
+        <Field Name="Workflow Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5252" />
+        <Field Name="From Address" Value="k2mailuser@gmail.com" />
+        <Field Name="Web Service URL" Value="http://SP2013VM:81" />
+        <Field Name="PIPURL" Value="http://localhost:8013" />
+        <Field Name="SmartForms Runtime SSL" Value="https://sp2013vm/Runtime/Runtime" />
+        <Field Name="Category Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="Workspace Url" Value="http://SP2013VM:81" />
+        <Field Name="Workflow Management Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer Runtime" Value="http://SP2013VM:81/Designer/Runtime" />
+        <Field Name="SmartForms Designer" Value="http://SP2013VM:81/Designer" />
+        <Field Name="SmartForms Runtime" Value="http://SP2013VM:81/Runtime/Runtime" />
+        <Field Name="Workspace Url SSL" Value="https://sp2013vm" />
+        <Field Name="ServiceObject Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer SSL" Value="https://sp2013vm/Designer" />
+        <Field Name="Mail Server" Value="smtp.gmail.com:587" />
+        <Field Name="SmartForms Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer Runtime SSL" Value="https://sp2013vm/Designer/Runtime" />
+        <Field Name="SmartObject Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="ADFS Logout" Value="https://k2test.etisalat.com.ng/runtime/_trust/logout.aspx" />
+        <Field Name="Web Service URL SSL" Value="https://sp2013vm" />
+      </Root>
+    </EnvironmentFields>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Environment) == 'Production'">
+    <EnvironmentFields>
+      <Root Name="Production" xmlns="">
+        <Field Name="Workflow Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5252" />
+        <Field Name="From Address" Value="mossadmin@TESTPORTAL" />
+        <Field Name="Web Service URL" Value="http://SP2013VM:81" />
+        <Field Name="PIPURL" Value="http://localhost:8013" />
+        <Field Name="SmartForms Runtime SSL" Value="https://sp2013vm/Runtime/Runtime" />
+        <Field Name="Category Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="Workspace Url" Value="http://SP2013VM:81" />
+        <Field Name="Workflow Management Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer Runtime" Value="http://SP2013VM:81/Designer/Runtime" />
+        <Field Name="SmartForms Designer" Value="http://SP2013VM:81/Designer" />
+        <Field Name="SmartForms Runtime" Value="http://SP2013VM:81/Runtime/Runtime" />
+        <Field Name="Workspace Url SSL" Value="https://sp2013vm" />
+        <Field Name="ServiceObject Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer SSL" Value="https://sp2013vm/Designer" />
+        <Field Name="Mail Server" Value="smtp.outlook.office365.com:587" />
+        <Field Name="SmartForms Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="SmartForms Designer Runtime SSL" Value="https://sp2013vm/Designer/Runtime" />
+        <Field Name="SmartObject Server" Value="Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;Host=SP2013VM;Port=5555" />
+        <Field Name="ADFS Logout" Value="" />
+        <Field Name="Web Service URL SSL" Value="https://sp2013vm" />
+      </Root>
+    </EnvironmentFields>
+  </PropertyGroup>
+  <PropertyGroup>
+    <WorkflowManagementConnectionStringProperty>$Field=Workflow Management Server</WorkflowManagementConnectionStringProperty>
+    <SmartObjectConnectionStringProperty>$Field=SmartObject Server</SmartObjectConnectionStringProperty>
+    <DeploymentLabelName>TESTPORTAL\mossadmin - 8/18/2017 3:35:52 PM</DeploymentLabelName>
+    <DeploymentLabelDescription />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageResource Include="Resources\ProductImplementation-Concept.Processes.res">
+      <Name>ProductImplementation-Concept</Name>
+      <Group>Processes</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-Implementation.Processes.res">
+      <Name>ProductImplementation-Implementation</Name>
+      <Group>Processes</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-ProductImpl.Processes.res">
+      <Name>ProductImplementation-ProductImpl</Name>
+      <Group>Processes</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-Testing.Processes.res">
+      <Name>ProductImplementation-Testing</Name>
+      <Group>Processes</Group>
+    </PackageResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageResource Include="Resources\NotificationServiceDetails 301c8621bfc745ef8bcd800a807c52ae.Notifications.res">
+      <Name>NotificationServiceDetails 301c8621bfc745ef8bcd800a807c52ae</Name>
+      <Group>Notifications</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\NotificationServiceDetails 9dfe79f3795d4e7a91c4fb7477589536.Notifications.res">
+      <Name>NotificationServiceDetails 9dfe79f3795d4e7a91c4fb7477589536</Name>
+      <Group>Notifications</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\NotificationServiceDetails cb75c4449265451bb9a323824ac467bf.Notifications.res">
+      <Name>NotificationServiceDetails cb75c4449265451bb9a323824ac467bf</Name>
+      <Group>Notifications</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\NotificationServiceDetails cfaba09f17514e679ef0f5c9b5a89e22.Notifications.res">
+      <Name>NotificationServiceDetails cfaba09f17514e679ef0f5c9b5a89e22</Name>
+      <Group>Notifications</Group>
+    </PackageResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageResource Include="Resources\WorkflowReportingServiceDetails 9a23b302-dbac-443c-94c5-c129edc54781.WorkflowReportingSmartObjects.res">
+      <Name>WorkflowReportingServiceDetails 9a23b302-dbac-443c-94c5-c129edc54781</Name>
+      <Group>WorkflowReportingSmartObjects</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\WorkflowReportingServiceDetails f50d1477-9a42-4a80-8af2-1b528b219d62.WorkflowReportingSmartObjects.res">
+      <Name>WorkflowReportingServiceDetails f50d1477-9a42-4a80-8af2-1b528b219d62</Name>
+      <Group>WorkflowReportingSmartObjects</Group>
+    </PackageResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageResource Include="Resources\ProductImplementation-Concept-ProcessView.Views.res">
+      <Name>ProductImplementation-Concept-ProcessView</Name>
+      <Group>Views</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-Implementation-ProcessView.Views.res">
+      <Name>ProductImplementation-Implementation-ProcessView</Name>
+      <Group>Views</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-ProductImpl-ProcessView.Views.res">
+      <Name>ProductImplementation-ProductImpl-ProcessView</Name>
+      <Group>Views</Group>
+    </PackageResource>
+    <PackageResource Include="Resources\ProductImplementation-Testing-ProcessView.Views.res">
+      <Name>ProductImplementation-Testing-ProcessView</Name>
+      <Group>Views</Group>
+    </PackageResource>
+  </ItemGroup>
+  <Target Name="Deploy" DependsOnTargets="Deploy Processes;Create Notifications;Create Workflow SmartObjects;Create Workflow Reporting SmartObjects" />
+  <Import Project="ProjectDeployment.targets" />
+  <Target Name="Deploy Processes" Condition="$(Deploy_Processes) == 'true'">
+    <SourceCode.DeploymentTasks.ExportProcessTask TaskGuid="24993beba8f847acae7b9833f9edb814" />
+  </Target>
+  <UsingTask TaskName="SourceCode.DeploymentTasks.ExportProcessTask" AssemblyFile="Bin\SourceCode.DeploymentTasks.dll" />
+  <Target Name="Create Notifications" Condition="$(Create_Notifications) == 'true'">
+    <SourceCode.DeploymentTasks.NotificationService.NotificationTask TaskGuid="ac69b38292714b4487227d933556da6b" />
+  </Target>
+  <UsingTask TaskName="SourceCode.DeploymentTasks.NotificationService.NotificationTask" AssemblyFile="Bin\SourceCode.DeploymentTasks.dll" />
+  <Target Name="Create Workflow SmartObjects" Condition="$(Create_Workflow_SmartObjects) == 'true'" />
+  <Target Name="Create Workflow Reporting SmartObjects" Condition="$(Create_Workflow_Reporting_SmartObjects) == 'true'">
+    <SourceCode.DeploymentTasks.SmartObjectServices.WorkflowReportingServiceTask TaskGuid="55ff4678937d482aa1cc7584653b4831" />
+  </Target>
+  <UsingTask TaskName="SourceCode.DeploymentTasks.SmartObjectServices.WorkflowReportingServiceTask" AssemblyFile="Bin\SourceCode.DeploymentTasks.dll" />
+</Project>

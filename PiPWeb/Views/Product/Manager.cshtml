@@ -1,0 +1,181 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model BrdInfo
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+   
+    var theId = Model.RequestId;
+}
+<link href="~/Styles/sweetalert.css" rel="stylesheet"/>
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+<section id="home">
+                <div class="green-header"><h4>BRD Stage Initiation Page</h4></div>
+
+    <div class="container">
+        <div class="main-content">
+
+
+            <div>
+
+                @using (Html.BeginForm("AssignTask", "Product", FormMethod.Post, new { id = "brdFrm" }))
+                {
+
+
+                    <div class="col-xs-12 info" style="margin-top: 5px;">
+                        <p class="col-md-4 col-xs-12"></p>
+                        <input type="hidden" value="141_concept" id="tag" name="tag"/>
+                        <input type="hidden" id="requestId" name="requestId" value="@theId"/>
+                        <input type="hidden" id="SN" name="SN" value="@Model.SN"/>
+                        @{
+                                var user = new ADModel();
+
+                                if (TempData["aduser"] != null)
+                                {
+                                    user = (ADModel)TempData["aduser"];
+                                            <p class="col-md-4 col-xs-12" id="username">@user.UserName</p>
+                                            <p class="col-md-4 col-xs-12"> @user.Email</p>
+                                              
+                                    
+                                }
+
+                        }
+
+                    </div>
+                    <div class="sub-green col-xs-12 mt20">
+                        <h4>Concept Details</h4>
+                    </div>
+                    <div class="col-xs-12 info">
+                        <p class="col-md-4 col-xs-12">Concept Owner</p>
+                        <p class="col-md-4 col-xs-12">Concept Initiator</p>
+                        <p class="col-md-4 col-xs-12">Product Description</p>
+                        @{
+                    var conceptInfo = new ConceptInfo();
+                    if (TempData["conceptInfo"] != null)
+                    {
+                        conceptInfo = (ConceptInfo)TempData["conceptInfo"];
+
+
+                    }
+
+                            <p class="col-md-4 col-xs-12">@conceptInfo.ConceptOwner</p>
+                            <p class="col-md-4 col-xs-12">@conceptInfo.OriginatorUserName</p>
+                            <p class="col-md-4 col-xs-12">@conceptInfo.ProductDescription</p>
+
+
+
+                        }
+                    </div>
+
+                    <div class="sub-green col-xs-12 mt20">
+                        <h4 class="pull-left">BRD Detials</h4>
+                        <i class="fa fa-chevron-up pull-right pt10"></i>
+                    </div>
+                    <div class="col-md-4 form-group col-xs-12">
+                        <br/>
+                        <label>Task Assigned to</label><br>
+                        <select class="col-xs-12 chosen-select" id="assignedTo" name="assignedTo" data-placeholder="Select User .." id="assign">
+                            @{
+                                var adUserList = new List<ADModel>();
+                                if (TempData["aduserList"] != null)
+                                {
+                                    adUserList = (List<ADModel>) TempData["aduserList"];
+                                }
+                                foreach (var item in adUserList)
+                                {
+
+                                    <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group col-xs-12">
+                        <br/>
+                        <label>Priority Level</label><br>
+                        <select class="chosen-select col-xs-12" name="taskPriority" id="taskPriority">
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                            <option value="Normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group col-xs-12">
+                        <br/>
+                        <label>SLA Category</label><br>
+                        <select class="col-xs-12 chosen-select" name="slaCategory" id="slaCategory">
+                            @{
+                    var slaCategoryList = new List<SlaCategory>();
+                                if (TempData["slaCategoryList"] != null)
+                                {
+                                    slaCategoryList = (List<SlaCategory>) TempData["slaCategoryList"];
+
+                                    foreach (var item in slaCategoryList)
+                                    {
+
+                                        <option value="@item.Id">@item.Category</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    
+
+                <div class="col-xs-12 form-group">
+                    <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitBrdFrm">SUBMIT</button>
+                </div>
+                }
+            </div>
+           
+        </div>
+    </div>
+
+</section>
+<script>
+    
+
+    $(function () {
+        $('#brdFrm').submit(function () {
+       
+           
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    
+                    if (result.f != null) {
+
+                        swal(result.f, "!", "error");
+
+                    } else {
+
+
+                        swal({
+                            title: "Success!",
+                            text: result.s,
+                            type: "success"
+                        });
+
+                      
+                    }
+
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+
+
+
+<script>
+
+    $("#datepicker, #st,#stp").datepicker();
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+   
+   
+   
+</script>

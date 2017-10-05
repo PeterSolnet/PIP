@@ -1,0 +1,405 @@
+﻿@using K2.WebApi.Models
+@model K2.WebApi.Models.BrdInfo
+
+
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var documentInfos = TempData["documentInfoList"];
+    var docInfos = (List<DocumentInfo>)documentInfos;  
+    
+}
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<link href="~/Styles/sweetalert.css" rel="stylesheet"/>
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+<script src="~/Content/chosen/chosen.jquery.min.js"></script>
+<script src="~/Content/chosen/chosen.proto.min.js"></script>
+
+<section class="container-fluid pl0 pr0">
+<div class="green-header"><h4>BRD Acceptanc/Rejection Form</h4></div>
+<div class="form col-md-12 container-fluid">
+@using (Html.BeginForm("ApproveBrdRequest", "Implementation", FormMethod.Post, new { id = "SubmitAcceptReject" }))
+{
+    <input type="hidden" id="requestId" value="@Model.RequestId" name="requestId"/>
+    <input type="hidden" id="SN" value="@Model.SN" name="SN"/>
+    
+        <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">BRD Detials</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+
+    <div class="col-xs-12 info">
+        @{
+    var roadMapMasterInfo = new RoadMapMaster();
+    if (TempData["roadMapMasterInfo"] != null)
+    {
+        roadMapMasterInfo = (RoadMapMaster)TempData["roadMapMasterInfo"];
+                            <div class="form-group col-md-3 pull-right col-xs-12" id="rm">
+                                <label>Road Map</label> <br/>
+                                <label>@roadMapMasterInfo.RoadMapName</label>
+                            </div>
+    }
+
+
+
+    if (Model != null)
+    {
+                    <div class="col-md-2 form-group col-xs-12 reviewStartDate">
+                        <label>Review Start Date</label><br>
+                        @Model.ReviewMeetingDate
+                    </div>
+            
+        var roadMapInfo = new RoadMap();
+        roadMapInfo = (RoadMap)TempData["roadMapInfo"];
+        if (roadMapInfo != null)
+        {
+                                        <div class="col-md-3 form-group col-xs-12">
+                                            <label>Concept Name</label><br>
+                                            @roadMapInfo.ConceptName
+                                        </div>
+                                        <div class="col-md-3 form-group col-xs-12">
+                                            <label>Concept Owner</label><br>
+                                            @roadMapInfo.ConceptOwner
+                                        </div>
+
+        }
+    }
+
+        }
+
+      
+
+        <div class="col-md-10 col-xs-12"></div>
+    </div>
+
+
+    <div id="brd">
+        <div class="sub-green col-xs-12 mt20">
+            <h4 class="pull-left">BRD Reviewers</h4>
+            <i class="fa fa-chevron-up pull-right pt10"></i>
+        </div>
+
+        <div class="col-xs-12 info">
+            <div class="form-group col-md-6 col-xs-12">
+                <label>Internal Reviewers</label><br>
+                @{
+    var stakeHolders = new StakeHolder();
+    stakeHolders = (StakeHolder)TempData["stakeHolders"];
+    if (stakeHolders != null)
+    {
+        List<string> allStakeholders = new List<string>();
+
+        allStakeholders = stakeHolders.StakeHolderName.TrimEnd(';').Split(';').ToList();
+                        <ul>
+                            @foreach (var item in allStakeholders)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+    }
+                }
+            </div>
+            <div class="form-group col-md-6 col-x-s12">
+                <label>External Reviewers Email(s) (<small>e.g example@gmail.com;tundea@yahoo.com</small>)</label><br>
+                @{
+    if (Model != null)
+    {
+        List<string> externalReviewer = new List<string>();
+        externalReviewer = Model.ExternalReviewer.TrimEnd(';').Split(';').ToList();
+                        <ul>
+                            @foreach (var item in externalReviewer)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+    }
+                }
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Attachements</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>File</th>
+                <th>Description</th>
+            </tr>
+            <tbody>
+            @{
+    var documentInfoList = new List<DocumentInfo>();
+    if (TempData["documentInfoList"] != null)
+    {
+        documentInfoList = (List<DocumentInfo>)TempData["documentInfoList"];
+    }
+    foreach (var item in documentInfoList)
+    {
+                                <tr>
+                                    <td><a href="@HttpUtility.UrlDecode(item.DocumentPath)" target="_blank">@item.DocumentName</a>
+                                    </td>
+                                    <td>@item.DocumentDescription</td>
+                                </tr>
+
+    }
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+            <h4 class="pull-left">Production Timelines</h4>
+            <i class="fa fa-chevron-up pull-right pt10"></i>
+        </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table" style="border: 0; height: auto;" id="datagrid">
+            <thead>
+            <tr>
+                <th></th>
+                <th class='hide id'></th>
+                <th class='hide'>
+                <th>Activity</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+                
+                            var brdprodImplTimeline = new List<ImplementationTimeline>();
+                            if (TempData["BrdprodImplTimelineList"] != null)
+                            {
+                                brdprodImplTimeline = (List<ImplementationTimeline>)TempData["BrdprodImplTimelineList"];
+
+                                foreach (var item in brdprodImplTimeline)
+                                {
+                                                <tr>
+                                                    <td class="hide id">@item.Id</td>
+                                                    <td class="hide">@item.ImplementationInfoId</td>
+                                                    <td><input name='record' type="radio" disabled></td>
+                                                    <td>@item.ActivityName</td>
+                                                    <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                                                    <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                                                </tr>
+                                }
+                            }
+
+                            var prodImplTimeline = new List<ImplementationTimeline>();
+                            if (TempData["prodImplTimelineList"] != null)
+                            {
+                                prodImplTimeline = (List<ImplementationTimeline>)TempData["prodImplTimelineList"];
+
+                                foreach (var item in prodImplTimeline)
+                                {
+                                                <tr>
+                                                    <td class="hide id">@item.Id</td>
+                                                    <td class="hide">@item.ImplementationInfoId</td>
+                                                    <td><input name='record' type="radio" disabled></td>
+                                                    <td>@item.ActivityName</td>
+                                                    <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                                                    <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                                                </tr>
+                                }
+                            }
+
+            }
+            </tbody>
+        </table>
+    </div>
+    
+        <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Action History</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table" style="border: 0; height: auto;">
+            <thead>
+            <tr>
+                <th>Arrival Time</th>
+                <th>Action Time</th>
+                <th>Activity</th>
+                <th>Action</th>
+                <th>Participant</th>
+                <th>Destination User</th>
+                <th>Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+    var actionHistory = new List<ActionHistoryInfo>();
+    if (TempData["actionHistory"] != null)
+    {
+        actionHistory = (List<ActionHistoryInfo>)TempData["actionHistory"];
+        foreach (var item in actionHistory)
+        {
+                        <tr>
+                            <td>@item.WorkListArrivalTime</td>
+                            <td>@item.ActionTimeStamp</td>
+                            <td>@item.Activity</td>
+                            <td>@item.Action</td>
+                            <td>@item.Participant</td>
+                            <td>@item.DestinationUser</td>
+                            <td>@item.Comment</td>
+                        </tr>
+        }
+    }
+
+            }
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Workflow Approver's Action</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+        <div class="col-xs-12 info">
+             <div class="form-group col-md-3 col-xs-12 approverAction">
+                <label>Select Action</label>
+                @{
+                    if (TempData["K2ActionName"] != null)
+                    {
+                        var actionName = (List<string>) TempData["K2ActionName"];
+
+                        <select id="ApprovalAction" name="approvalAction" class="col-xs-12 chosen-select">
+                            <option value="">Select an Action</option>
+                            @foreach (var item in actionName)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                    }
+                }
+            </div>
+
+             <div class="col-md-3 form-group col-xs-12 taskAsssignedTo">
+                <label>Task Assigned To</label><br>
+               <select class="chosen-select" id="taskAsssignedTo" name="taskAsssignedTo" data-placeholder="Select User ..">
+                   @{
+                      var adUserList = new List<ADModel>();
+                      if (TempData["aduserList"] != null)
+                      {
+                           adUserList = (List<ADModel>) TempData["aduserList"];
+                          foreach (var item in adUserList)
+                          {
+                            <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                          }
+                      }
+                          
+                     }
+              </select>
+            </div>
+
+             <div class="col-md-3 form-group col-xs-12 taskPriority">
+            
+                <label>Priority Level</label><br>
+                <select class="chosen-select col-xs-12" name="taskPriority" id="taskPriority">
+                    <option value="High">High</option>
+                    <option value="Low">Low</option>
+                    <option value="Normal">Normal</option>
+                </select>
+            </div>
+
+             <div class="col-md-3 form-group col-xs-12 slaCategory">
+                            <label>SLA Category</label><br>
+                            <select class="col-xs-12 chosen-select" name="slaCategory" id="slaCategory">
+                                @{
+                        var slaCategoryList = new List<SlaCategory>();
+                                    if (TempData["slaCategoryList"] != null)
+                                    {
+                                        slaCategoryList = (List<SlaCategory>) TempData["slaCategoryList"];
+
+                                        foreach (var item in slaCategoryList)
+                                        {
+
+                                            <option value="@item.Id">@item.Category</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+            <p class="col-xs-12">Comments</p>
+            <div class="form-group col-xs-12 col-md-4">
+                <textarea id="approverComment" name="approverComment" rows="5" class="form-control col-md-3 col-xs-12"></textarea>
+            </div>
+        </div>
+    <div class="col-xs-12 form-group">
+        <div id="cancel" class="btn btn-primary col-md-offset-5 col-md-2 col-xs-12 mr10">CANCEL</div>
+        <button type="submit" id="submitBtn" name="submitBtn" class="btn btn-primary col-md-2 col-xs-12">SUBMIT</button>
+    </div>
+}
+
+</div>
+</section>
+
+<script>
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+    $(document).ready(function () {
+        $(".taskPriority").hide();
+        $(".slaCategory").hide();
+        $(".taskAsssignedTo").hide();
+        $("#approverComment").removeAttr("required", true);
+
+        $(".approverAction").on('change', function () {
+            var selectedOption = $(this).find(":selected");
+            if (selectedOption.val() === "Assign") {
+                $(".taskPriority").show();
+                $(".slaCategory").show();
+                $(".taskAsssignedTo").show();
+
+                $("#approverComment").removeAttr("required", true);
+                $(".taskPriority").prop("required", true);
+                $(".slaCategory").prop("required", true);
+                $(".taskAsssignedTo").prop("required", true);
+
+            } else {
+                $(".taskPriority").hide();
+                $(".slaCategory").hide();
+                $(".taskAsssignedTo").hide();
+
+                $("#approverComment").removeAttr("required", true);
+                $(".taskPriority").removeAttr("required", true);
+                $(".slaCategory").removeAttr("required", true);
+                $(".taskAsssignedTo").removeAttr("required", true);
+            }
+            
+            if (selectedOption.val() === "Reject") {
+                $("#approverComment").prop("required", true);
+            }
+        });
+
+        $("#SubmitAcceptReject").submit(function () {
+            if ($(".approverAction option:selected").val() === "Assign") {
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+
+                        if (result.f != null) {
+                            swal(result.f, "", "error");
+                        } else {
+                            swal(result.s, "", "success");
+                        }
+
+                    }
+
+                });
+                return false;
+            }
+            if ($(".approverAction option:selected").val() === "Reject") {
+                
+            }
+            
+        });
+    });
+
+</script>

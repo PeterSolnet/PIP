@@ -1,0 +1,623 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model dynamic
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //var theId = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 12);
+
+    ConceptInfo conceptInfo = new ConceptInfo();
+    conceptInfo = (ConceptInfo)TempData["conceptInfo"];
+
+    var brdlist = new BrdInfo();
+    brdlist = (BrdInfo)TempData["brdInfo"];
+    var apiUrl = (string)TempData["apiUrl"];
+}
+
+
+<section id="home">
+<div class="green-header"><h4>BRD Stage Initiation Page</h4>
+</div>
+
+<div class="container">
+<div class="main-content">
+
+@using (Html.BeginForm("UpdateStatus", "Product", FormMethod.Post, new { id = "brdFrm", role = "form" }))
+{
+    <div class="col-xs-12 info" style="margin-top: 5px;">
+
+        @{
+            if (conceptInfo != null)
+            {
+                        <input type="hidden" id="requestId" name="requestId" value="@conceptInfo.RequestId"/>
+                        <input type="hidden" id="apiUrl" name="apiUrl" value="@apiUrl"/>
+                    <input type="hidden" id="SN" name="SN" value="@brdlist.SN"/>
+            }
+        }
+
+
+        @{
+    var user = new ADModel();
+
+    if (TempData["aduser"] != null)
+    {
+        user = (ADModel)TempData["aduser"];
+                <p class="col-md-4 col-xs-12" id="username">@user.UserName</p>
+                <p class="col-md-4 col-xs-12"> @user.Email</p>
+    }
+
+
+        }
+
+    </div>
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Concept Details</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info">
+        <p class="col-md-4 col-xs-12">Concept Owner</p>
+        <p class="col-md-4 col-xs-12">Concept Initiator</p>
+        <p class="col-md-4 col-xs-12">Product Description</p>
+
+
+
+        @{
+    if (conceptInfo != null)
+    {
+                <p class="col-md-4 col-xs-12">@conceptInfo.ConceptOwner</p>
+                <p class="col-md-4 col-xs-12">@conceptInfo.OriginatorUserName</p>
+                <p class="col-md-4 col-xs-12">@conceptInfo.ProductDescription</p>
+    }
+
+
+        }
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">BRD Detials</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+
+    <div class="col-xs-12 info">
+        @{
+    var roadMapMasterInfo = new RoadMapMaster();
+    if (TempData["roadMapMasterInfo"] != null)
+    {
+        roadMapMasterInfo = (RoadMapMaster)TempData["roadMapMasterInfo"];
+                <div class="form-group col-md-3 pull-right col-xs-12" id="rm">
+                    <label>Road Map</label> <br/>
+                    <label>@roadMapMasterInfo.RoadMapName</label>
+                </div>
+    }
+
+
+
+    if (brdlist != null)
+    {
+                <div class="col-md-2 form-group col-xs-12 reviewStartDate">
+                    <label>Review Start Date</label><br>
+                    @brdlist.ReviewMeetingDate
+
+                </div>
+        var roadMapInfo = new RoadMap();
+        roadMapInfo = (RoadMap)TempData["roadMapInfo"];
+        if (roadMapInfo != null)
+        {
+                    <div class="col-md-3 form-group col-xs-12">
+                        <label>Concept Name</label><br>
+                        @roadMapInfo.ConceptName
+                    </div>
+                    <div class="col-md-3 form-group col-xs-12">
+                        <label>Concept Owner</label><br>
+                        @roadMapInfo.ConceptOwner
+                    </div>
+
+        }
+    }
+
+
+@* 
+                    var taskInfoList = new List<TaskInfo>();
+                    if (TempData["taskInfoList"] != null)
+                    {
+                        taskInfoList = (List<TaskInfo>)TempData["taskInfoList"];
+                          foreach (var item in taskInfoList)
+                          {
+                                <p class="col-md-4 col-xs-12">Task Assigned To: @item.Assignee</p>
+                                <p class="col-md-4 col-xs-12">Task Re Assigned To: </p>
+                                <p class="col-md-4 col-xs-12">Review Start Date: @item.AssignmentDate</p>                      
+                                <p class="col-md-4 col-xs-12">Priority Levels: @item.TaskPriority</p>
+                          }
+                        
+                              
+                    }
+                    *@
+
+        }
+
+        <div class="col-md-3 col-xs-12">
+            <label>BRD Status</label>
+            <select class="col-xs-12 chosen-select" id="status" name="status" data-placeholder="Select status ..">
+                <option value="" Selected>Select Document Status</option>
+                @{
+                    var actions = new List<string>();
+                    if (TempData["K2ActionName"] != null)
+                    {
+                        actions = (List<string>) TempData["K2ActionName"];
+                    }
+                    foreach (var item in actions)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="backToConceptCommentDiv">
+            <div class="form-group col-xs-12">
+                <label>Comments</label><br>
+                <textarea id="backToConceptComment" class="col-md-1" rows="2" cols="200" style="width: 500px; height: 200px;"></textarea>
+            </div>
+             <div class="col-xs-12 form-group" style="margin-top: 10px;">
+                <div class="btn btn-success col-md-2 col-xs-12 mr10" id="btnBbackToConcept">Return To Concept</div>  
+            </div>
+        </div>
+        
+
+        <div class="col-md-10 col-xs-12"></div>
+    </div>
+
+
+    <div id="brd">
+        <div class="sub-green col-xs-12 mt20">
+            <h4 class="pull-left">BRD Reviewers</h4>
+            <i class="fa fa-chevron-up pull-right pt10"></i>
+        </div>
+
+        <div class="col-xs-12 info">
+            <div class="form-group col-md-6 col-xs-12">
+                <label>Internal Reviewers</label><br>
+                @{
+    var stakeHolders = new StakeHolder();
+    stakeHolders = (StakeHolder)TempData["stakeHolders"];
+    if (stakeHolders != null)
+    {
+        List<string> allStakeholders = new List<string>();
+
+        allStakeholders = stakeHolders.StakeHolderName.TrimEnd(';').Split(';').ToList();
+                        <ul>
+                            @foreach (var item in allStakeholders)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+    }
+                }
+            </div>
+            <div class="form-group col-md-6 col-x-s12">
+                <label>External Reviewers Email(s) (<small>e.g example@gmail.com;tundea@yahoo.com</small>)</label><br>
+                @{
+    if (brdlist != null)
+    {
+        List<string> externalReviewer = new List<string>();
+        externalReviewer = brdlist.ExternalReviewer.TrimEnd(';').Split(';').ToList();
+                        <ul>
+                            @foreach (var item in externalReviewer)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+    }
+                }
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Attached Documents</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+
+        <table class="table" style="border: 0; height: auto;">
+            <thead>
+            <tr>
+                <th>File</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+    var documentInfoList = new List<DocumentInfo>();
+    if (TempData["documentInfoList"] != null)
+    {
+        documentInfoList = (List<DocumentInfo>)TempData["documentInfoList"];
+    }
+    foreach (var item in documentInfoList)
+    {
+                    <tr>
+                        <td><a href="@HttpUtility.UrlDecode(item.DocumentPath)" target="_blank">@item.DocumentName</a>
+                        </td>
+                        <td>@item.DocumentDescription</td>
+                    </tr>
+
+    }
+            }
+            </tbody>
+        </table>
+
+    </div>
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Action History</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table id="documentsTables" class="stripe" style="border: 0; height: auto;">
+
+            <thead>
+            <tr>
+                <th>Arrival Time</th>
+                <th>Action Time</th>
+                <th>Activity</th>
+                <th>Action</th>
+                <th>Participant</th>
+                <th>Destination User</th>
+                <th>Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+    var actionHistory = new List<ActionHistoryInfo>();
+    if (TempData["actionHistory"] != null)
+    {
+        actionHistory = (List<ActionHistoryInfo>)TempData["actionHistory"];
+        foreach (var item in actionHistory)
+        {
+                        <tr>
+                            <td>@item.WorkListArrivalTime</td>
+                            <td>@item.ActionTimeStamp</td>
+                            <td>@item.Activity</td>
+                            <td>@item.Action</td>
+                            <td>@item.Participant</td>
+                            <td>@item.DestinationUser</td>
+                            <td>@item.Comment</td>
+                        </tr>
+        }
+    }
+
+            }
+            </tbody>
+        </table>
+
+    </div>
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Production Timelines</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table" style="border: 0; height: auto;" id="datagrid">
+            <thead>
+            <tr>
+                <th class="hide"></th>
+                <th class="hide"></th>
+                <th></th>
+                <th>Activity</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+    var prodImplTimeline = new List<ImplementationTimeline>();
+    if (TempData["prodImplTimeline"] != null)
+    {
+        prodImplTimeline = (List<ImplementationTimeline>)TempData["prodImplTimeline"];
+
+        foreach (var item in prodImplTimeline)
+        {
+                        <tr>
+                            <td class="hide id">@item.Id</td>
+                            <td class="hide">@item.ImplementationInfoId</td>
+                            <td><input type="radio" disabled></td>
+                            <td>@item.ActivityName</td>
+                            <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                        </tr>
+        }
+    }
+
+            }
+            </tbody>
+        </table>
+
+        <p style="text-align: right; float: right; margin-right: 10px;">
+            <input class="form-control" type="text" placeholder="Stop Date" id="stp">
+        </p>
+
+        <p style="text-align: right; float: right; margin-right: 10px;">
+            <input class="form-control" type="text" placeholder="Start Date" id="st">
+        </p>
+
+        <p style="text-align: right; float: right; margin-right: 10px;">
+             <select class="form-control chosen-select" id="ac"  data-placeholder="Select Activity ..">
+                    @{
+                        var activityInfoList = new List<ActivityInfo>();
+                        if (TempData["activityInfoList"] != null)
+                        {
+                            activityInfoList = (List<ActivityInfo>)TempData["activityInfoList"];
+                             foreach (var item in activityInfoList)
+                                {
+                                   <option value="@item.Id">@item.ActivityName</option>
+                                }
+                        }
+                       
+                    }
+                </select>
+            @*<input class="form-control" type="text" placeholder="Activities" id="ac">*@
+        </p><br/><br/><br/>
+
+        <button style="float: right; margin-right: 10px;" type="button" class="btn btn-success col-md-1 mr20 col-xs-12 add-row">Add</button>
+        <button style="float: right; margin-right: 10px;" type="button" class="btn btn-danger col-md-1 col-xs-12 delete-row">Remove</button>
+
+
+    </div>
+
+
+    <div id="documentDiv">
+        @Html.Partial("~/Views/Document/Index.cshtml")
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Document Status</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info">
+        <div class="form-group col-xs-12">
+            <label>Comments</label><br>
+            <textarea id="comment" class="col-md-1" rows="2" cols="200" style="width: 500px; height: 200px;"></textarea>
+
+        </div>
+
+    </div>
+    <div class="col-xs-12 form-group" style="margin-top: 10px;">
+        <div class="btn btn-success col-md-offset-5 col-md-2 col-xs-12 mr10" id="cancel">CANCEL</div>
+        <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitBrdFrm">SUBMIT</button>
+    </div>
+
+}
+</div>
+
+</div>
+</section>
+
+<script>
+    function ShowDocumentDiv() {
+        
+        var documentDiv = document.getElementById('documentDiv');
+        var documentSelect = document.getElementById('documentTypeId_chosen');
+
+        documentDiv.style.display = "inline";
+        documentSelect.style.width = '120px';
+        //document.getElementById("buttonNext").setAttribute('disabled', true);
+
+    }
+
+
+    $(function () {
+
+        $('#documentsTables').DataTable();
+        $("#cancel").click(function() {
+            top.location.href = "/";
+        });
+        $('#brdFrm').submit(function() {
+            $("#submitBrdFrm").attr("disabled", "disabled");
+            $.ajax({              
+                url: '/Product/UpdateStatus',
+                type: this.method,
+                data: JSON.stringify({ requestId: $("#requestId").val(), SN: $("#SN").val(), Status: $("#status").val(), Comment: $("#comment").val() }),
+                contentType: 'application/json, charset=utf-8',
+                cache: false,
+                dataType: "json",
+                
+                success: function (result) {
+
+                    if (result.f != null) {
+
+                        swal(result.f, "!", "error");
+                        $("#submitBrdFrm").removeAttr("disabled");
+
+                    } else {
+
+                        swal({
+                            title: "Success!",
+                            text: result.s,
+                            type: "success"
+                        });
+                        $("#submitBrdFrm").removeAttr("disabled");
+                        top.location.href = "/";
+                        ShowDocumentDiv();
+                    }
+
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+
+<script>
+    //$(document).ready(function () {
+    //    $("#submitBrdFrm").click(function () {
+    //        $.ajax({
+    //            type: "POST",
+    //            url: '/Product/CreateBrd',
+    //            //data: formData,
+    //            dataType: 'json',
+    //            contentType: false,
+    //            processData: false,
+    //            success: function (result) {                   
+    //                swal(result.s, "", "success");                  
+    //            },
+    //            error: function (error) {
+    //                alert("error");
+    //            }
+    //        });
+    //    });
+    //});
+</script>
+
+
+
+<script>
+
+    $("#datepicker, #st,#stp").datepicker();
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+    $(".add-row").click(function () {
+        $(".add-row").prop("disabled",true);
+        var impelemetInfoId = $('#datagrid tr:last-child td:nth-child(2)').html();
+        
+
+        var activity = $("#ac option:selected").text();
+        var activityId = $("#ac option:selected").val();
+        
+
+        if (activity === "" || $("#st").val() === "" || $("#stp").val() === "") {
+            swal("One or more fields is empty!", "Empty Field(s)", "error");
+            //$(".add-row").prop("disabled", false);
+            return false;
+        }
+        var start = new Date($("#st").val());
+
+        var stop = new Date($("#stp").val());
+        if (start > stop) {
+            swal("End date cannot be earlier than Start date", "Invalid Date Enrty", "error");
+            //$(".add-row").prop("disabled", false);
+            return false;
+        }
+        
+        var timelineData = JSON.stringify({ ActivityName: activity, ActivityId: activityId, TimeLineStartDate: start, TimeLineEndDate: stop, RequestId: $("#requestId").val(), ImplementationInfoId: impelemetInfoId });
+
+        $.ajax({
+            type: "POST",
+            url: 'AddNewImplimentationTimeLine',
+            dataType: "json",
+            data:   timelineData,
+            contentType: 'application/json, charset=utf-8',
+            processData: false,
+            success: function (result) {
+                
+                if (result.f !== undefined) {
+                    swal(result.f, "!", "error");
+                   // $(".add-row").prop("disabled", false);
+                }
+                else if (result.s !== undefined) {
+                    var markup = "<tr><td class='hide id'>" + result.id + "</td><td class='hide'>" + impelemetInfoId + "</td><td><input type='radio' name='record'></td><td>" + activity + "</td><td>" + $("#st").val() + "</td><td>" + $("#stp").val() + "</td></tr>";
+                    $("#datagrid tbody").append(markup);
+                    compact();
+                    $("#ac").val('');
+                    $("#st").val('');
+                    $("#stp").val('');
+                    //$(".add-row").prop("disabled", false);
+                }
+            }
+        });
+        
+        $(".add-row").prop("disabled", false);
+    });
+
+    // Find and remove selected table rows
+    $(".delete-row").click(function () {
+        $(".delete-row").prop("disabled", true);
+        $("#datagrid tbody").find('input[name="record"]').each(function () {
+            if ($(this).is(":checked")) {
+                var tr = $(this).parents("tr");
+                var iD=  $(this).closest("tr")   // Finds the closest row <tr> 
+                       .find(".id")     // Gets a descendent with class="nr"
+                       .text();         // Retrieves the text within <td>
+
+                
+                $.ajax({
+                    type: "POST",
+                    url: 'RemoveImplimentationTimeLine',
+                    dataType: "json",
+                    data: JSON.stringify({ id: iD }),
+                    contentType: 'application/json, charset=utf-8',
+                    processData: false,
+                    success: function (result) {
+                        if (result.f !== undefined) {
+                            swal(result.f, "!", "error");
+                        }
+                        else if (result.s !== undefined) {
+                            tr.remove();
+                        }
+                    }
+                });
+
+                
+            }
+        });
+        compact();
+        $(".delete-row").prop("disabled", false);
+    });
+
+    function compact() {
+        var myTableArray = [];
+        $("#datagrid tr").each(function(i, v) {
+            var data = [];
+            var tableData = $(this).find('td');
+            if (tableData.length > 0) {
+                tableData.each(function() { data.push($(this).text()); });
+                myTableArray.push(data);
+            }
+        });
+
+        return myTableArray;
+    }
+
+    $(".backToConceptCommentDiv").hide();
+    
+    $('#status').on('change', function () {
+        var element = $(this).find('option:selected');
+        $(".backToConceptCommentDiv").removeAttr("required");
+        if (element.val() === "Back to Concept") {
+            $(".backToConceptCommentDiv").show();
+            $(".backToConceptCommentDiv").attr("required", true);
+        } else {
+            $(".backToConceptCommentDiv").hide();
+            $(".backToConceptCommentDiv").removeAttr("required");
+        }
+    });
+
+    // Find and remove selected table rows
+    $("#btnBbackToConcept").click(function () {
+        $("#btnBbackToConcept").prop("disabled", true);
+                $.ajax({
+                    type: "POST",
+                    url: 'ReturnToConcept',
+                    dataType: "json",
+                    data: JSON.stringify({ requestId: $("#requestId").val(), comment: $(".backToConceptComment").val(), SN: $("#SN").val() }),
+                    contentType: 'application/json, charset=utf-8',
+                    processData: false,
+                    success: function (result) {
+                        if (result.f !== undefined) {
+                            swal(result.f, "!", "error");
+                        }
+                        else if (result.s !== undefined) {
+                            swal({
+                                title: "Success!",
+                                text: result.s,
+                                type: "success"
+                            });
+                            top.location.href = "/";
+                        }
+                    }
+                });
+
+
+                $("#btnBbackToConcept").prop("disabled", false);
+    });
+
+</script>

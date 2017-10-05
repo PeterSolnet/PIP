@@ -1,0 +1,42 @@
+﻿using System;
+using log4net;
+using log4net.Config;
+using Provisioning.Commands.Model;
+using Provisioning.Expressions;
+using Provisioning.Receivers;
+using ProvisioningWebApi.Services;
+
+namespace Provisioning.Commands
+{
+    public class GetOpenBatchCommand:CommandBase
+    {
+        protected static readonly ILog log = LogManager.GetLogger(typeof(GetOpenBatchCommand));
+        GoldService service = new GoldService();
+
+
+        public GetOpenBatchCommand(IReceiver receiver, string extra)
+            : base(receiver, extra)
+        {
+            XmlConfigurator.Configure();
+        }
+        public override  CommandStatus Execute(ExpressionContext context)
+        {
+            
+           
+            var args = GetArguments(context);
+            string openStatus = args[0].ToString();
+           
+            try
+            {
+                var openBatch =  service.GetBatchByStatus(openStatus);
+                //log.Info($"Found : {openBatch.Result.BatchStatus}: {openBatch.Result.BatchNo}: {openBatch.Result.Id}");
+                return new CommandStatus { Data = openBatch.Result, StatusCode = CommandCode.Ok };
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error :" + ex);
+                return new CommandStatus { StatusCode = CommandCode.Failed };
+            }
+        }
+    }
+}

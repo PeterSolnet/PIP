@@ -1,0 +1,77 @@
+﻿private K2Context db=new K2Context();
+        public IQueryable<K2NameIssue> GetK2NameIssues()
+        {
+            return db.K2NameIssues;
+        }
+        [ResponseType(typeof(K2NameIssue))]
+        public async Task<IHttpActionResult> GetK2NameIssue(long id)
+        {
+            K2NameIssue k2NameIssue = await db.K2NameIssues.FindAsync(id);
+            if (k2NameIssue == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(k2NameIssue);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private bool K2NameIssueExists(long id)
+        {
+            return db.K2NameIssues.Count(e => e.Id == id) > 0;
+        }
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> PutK2NameIssue(long id, K2NameIssue k2NameIssue)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != k2NameIssue.Id)
+            {
+                return BadRequest();
+            }
+
+            db.Entry(k2NameIssue).State = EntityState.Modified;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!K2NameIssueExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        // POST: api/TeamsApi
+        [ResponseType(typeof(K2NameIssue))]
+        public async Task<IHttpActionResult> PostK2NameIssue(K2NameIssue k2NameIssue)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            db.K2NameIssues.Add(k2NameIssue);
+            await db.SaveChangesAsync();
+
+            return CreatedAtRoute("DefaultApi", new { id = k2NameIssue.Id }, k2NameIssue);
+        }

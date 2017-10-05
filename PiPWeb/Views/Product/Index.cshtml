@@ -1,0 +1,725 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model BrdInfo
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    //var apiUrl = (string)TempData["apiUrl"];
+    
+    var conceptDetails = new ConceptInfo();
+    if (TempData["conceptInfo"] != null)
+    {
+        conceptDetails = (ConceptInfo)TempData["conceptInfo"];
+
+
+    }
+}
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<link href="~/Styles/sweetalert.css" rel="stylesheet"/>
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+<section id="home">
+<div class="green-header">
+    <h4>BRD Draft Stage Page</h4>
+</div>
+@{
+    var user = new ADModel();
+}
+<div class="container">
+<div class="main-content">
+<div>
+
+@using (Html.BeginForm("SubmitDraftBrd", "Product", FormMethod.Post, new {id = "brdFrm", role = "form"}))
+{
+    <input type="hidden" id="requestId" value="@Model.RequestId"/>
+    <input type="hidden" id="SN" value="@Model.SN"/>
+    <div class="sub-green col-xs-12 mt20">
+        <h4>Concept Details</h4>
+    </div>
+    <div class="col-xs-12 info">
+        <p class="col-md-4 col-xs-12">Concept Owner</p>
+        <p class="col-md-4 col-xs-12">Concept Initiator</p>
+        <p class="col-md-4 col-xs-12">Product Description</p>
+
+        @{
+
+            <p class="col-md-4 col-xs-12">@conceptDetails.ConceptOwner</p>
+            <p class="col-md-4 col-xs-12">@conceptDetails.OriginatorUserName</p>
+            <p class="col-md-4 col-xs-12">@conceptDetails.ProductDescription</p>
+
+
+
+        }
+    </div>
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Attached Documents</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table" style="border: 0; height: auto;">
+            <thead>
+            <tr>
+                <th>File</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+                var attchedfiles = new List<DocumentInfo>();
+                if (TempData["documentInfoList"] != null)
+                {
+                    attchedfiles = (List<DocumentInfo>) TempData["documentInfoList"];
+                }
+                foreach (var item in attchedfiles)
+                {
+                    var docDesc = item.DocumentDescription != null ? item.DocumentDescription : "NA";
+                    <tr>
+                        <td><a href="@item.DocumentPath" target="_blank">@item.DocumentName</a></td>
+
+                        <td>@docDesc</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Action History</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table" style="border: 0; height: auto;">
+            <thead>
+            <tr>
+                <th>Arrival Time</th>
+                <th>Action Time</th>
+                <th>Activity</th>
+                <th>Action</th>
+                <th>Participant</th>
+                <th>Destination User</th>
+                <th>Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+                var actionHistory = new List<ActionHistoryInfo>();
+                if (TempData["actionHistory"] != null)
+                {
+                    actionHistory = (List<ActionHistoryInfo>) TempData["actionHistory"];
+                    foreach (var item in actionHistory)
+                    {
+                        <tr>
+                            <td>@item.WorkListArrivalTime</td>
+                            <td>@item.ActionTimeStamp</td>
+                            <td>@item.Activity</td>
+                            <td>@item.Action</td>
+                            <td>@item.Participant</td>
+                            <td>@item.DestinationUser</td>
+                            <td>@item.Comment</td>
+                        </tr>
+                    }
+                }
+
+            }
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">BRD Detials</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    
+    <div class="col-xs-12 info">
+        <div class="form-group col-md-4 pull-right col-xs-12" id="rm">
+            <label>Select Road Map</label><br>
+            <select class="col-xs-12 chosen-select" id="roadmap" name="roadmap" data-placeholder="Select Brd ..">
+                <option value="000">Select a Road Map</option>
+                @{
+                    var currentRoadMaps = new List<RoadMapViewModel>();
+                    if (TempData["currentRoadMaps"] != null)
+                    {
+                        currentRoadMaps = (List<RoadMapViewModel>)TempData["currentRoadMaps"];
+                    }
+                    foreach (var item in currentRoadMaps)
+                    {
+                        <option value="@item.Id" roadMasterId="@item.RoadMapMasterId">@item.RoadMapName</option>
+                    }
+                }
+            </select>
+        </div>
+        @{
+
+            if (TempData["taskInfo"] != null)
+            {
+                var taskInfo = (TaskInfo) TempData["taskInfo"];
+                <div class="col-md-2 form-group col-xs-12">
+                    <label>Priority Level</label><br>
+                    <p style="color: #A9A9A9;">
+                    @taskInfo.TaskPriority
+                    <p>
+                </div>
+
+            }
+
+        }
+
+
+
+
+        <div class="col-md-2 form-group col-xs-12">
+            <label>Action</label><br>
+            <select class="col-xs-12 chosen-select selectAction" name="Action" data-placeholder="Select Action ..">
+                <option value="Accept">Accept</option>
+                <option value="Reassign">Reassign</option>
+                <option value="Pause">Pause</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 form-group col-xs-12">
+            <label></label><br>
+            <textarea rows="8" cols="50" id="pauseComment" placeholder="Comment" name="pauseComment"></textarea>
+        </div>
+
+
+        <div class="col-md-2 form-group col-xs-12 Reassigned">
+            <label>Task Re-Assigned to</label><br>
+            <select class="col-xs-12 chosen-select" id="ReAssignedTo" name="ReAssignedTo" data-placeholder="Select User ..">
+                @{
+                    var adUserList2 = new List<ADModel>();
+                    if (TempData["aduserList"] != null)
+                    {
+                        adUserList2 = (List<ADModel>) TempData["aduserList"];
+                    }
+                    foreach (var item in adUserList2)
+                    {
+                        <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 form-group col-xs-12 reviewStartDate">
+            <label>Review Start Date</label><br>
+            <input class="form-control" id="reviewStartDate" name="reviewStartDate">
+        </div>
+
+        <div class="col-md-4 form-group pull-right col-xs-12" id="sc">
+            <label>Select Concept</label><br>
+            <select class="form-control chosen-select" id="ConceptInfo" name="ConceptInfo" data-placeholder="Select Concept ..">
+            </select>
+        </div>
+
+    </div>
+
+    <div id="brd">
+        <div class="sub-green col-xs-12 mt20">
+            <h4 class="pull-left">Add BRD Reviewers</h4>
+            <i class="fa fa-chevron-up pull-right pt10"></i>
+        </div>
+        <div class="col-xs-12 info">
+            <div class="form-group col-md-6 col-xs-12">
+                <label>Internal Reviewers</label><br>
+                <select class="form-control chosen-select" id="internalRev" multiple name="internalRev" data-placeholder="Select Reviewers ..">
+                    @{
+                        var adUserList1 = new List<ADModel>();
+                        if (TempData["adUserList"] != null)
+                        {
+                            adUserList1 = (List<ADModel>) TempData["aduserList"];
+                        }
+                        foreach (var item in adUserList1)
+                        {
+
+                            <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-md-6 col-x-s12">
+                <label>External Reviewers Email(s) (<small>e.g example@gmail.com;tundea@yahoo.com</small>)</label><br>
+                <input type="text" class="form-control" placeholder="Enter reviewer email" id="externalRev" name="externalRev">
+            </div>
+        </div>
+    </div>
+
+    <div class="prodTimeLine">
+
+        <div class="sub-green col-xs-12 mt20">
+            <h4 class="pull-left">Production Timelines</h4>
+            <i class="fa fa-chevron-up pull-right pt10"></i>
+        </div>
+        <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+            <table class="table" style="border: 0; height: auto;" id="datagrid">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class='hide id'></th>
+                    <th class='hide'>
+                    <th>Activity</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    var prodImplTimeline = new List<ImplementationTimeline>();
+                    if (TempData["prodImplTimelineList"] != null)
+                    {
+                        prodImplTimeline = (List<ImplementationTimeline>) TempData["prodImplTimelineList"];
+
+                        foreach (var item in prodImplTimeline)
+                        {
+                            <tr>
+                                <td class="hide id">@item.Id</td>
+                                <td class="hide">@item.ImplementationInfoId</td>
+                                <td><input name='record' type="radio"></td>
+                                <td>@item.ActivityName</td>
+                                <td>@item.TimelineStartDate.ToString("dd MMM yyyy")</td>
+                                <td>@item.TimelineEndDate.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    }
+
+                }
+                </tbody>
+            </table>
+
+            <p class="col-md-3 col-xs-12">
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <select class="form-control chosen-select" id="ac"  data-placeholder="Select Activity ..">
+                    @{
+                        var activityInfoList = new List<ActivityInfo>();
+                        if (TempData["activityInfoList"] != null)
+                        {
+                            activityInfoList = (List<ActivityInfo>)TempData["activityInfoList"];
+                             foreach (var item in activityInfoList)
+                                {
+                                   <option value="@item.Id">@item.ActivityName</option>
+                                }
+                        }
+                       
+                    }
+                </select>
+               @* <input type="text" class="form-control" placeholder="Activities" id="ac">*@
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <input type="text" class="form-control" placeholder="Start Date" id="st">
+            </p>
+            <p class="col-md-3 col-xs-12">
+                <input type="text" class="form-control" placeholder="Stop Date" id="stp">
+            </p>
+
+            <div class="form-group col-xs-12 mt20">
+                <button type="button" class="btn btn btn-success col-md-1 mr20 col-xs-12 add-row">Add</button>
+                <button type="button" class="btn btn-danger col-md-1 col-xs-12 delete-row">Remove</button>
+
+            </div>
+        </div>
+
+        @Html.Partial("~/Views/Document/Index.cshtml")
+
+        <p></p>
+        <div class="col-xs-12 info">
+            <div class="form-group col-md-3 col-xs-12">
+                <label>Document Status</label><br>
+                <select class="form-control chosen-select" id="status" name="status">
+                    <option selected value="Draft BRD">Draf BRD</option>
+                    <option value="Baselined BRD">Baselined BRD</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <p class="col-xs-12 form-group"></p>
+    <div class="col-xs-12 form-group">
+        <div class="btn btn-success col-md-offset-5 col-md-2 col-xs-12 mr10" id="can">CANCEL</div>
+
+        <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitBrdFrm">SUBMIT</button>
+
+    </div>
+}
+</div>
+
+</div>
+</div>
+
+</section>
+
+<script>
+
+    $(function () {
+
+        $("#reviewStartDate").prop("required", true);
+        $("#roadmap").prop("required", true);
+        $("#internalRev").prop("required", true);
+        $("#externalRev").prop("required", true);
+        $("#ConceptInfo").prop("required", true);
+        $("#ReAssignedTo").prop("required", true);
+        $("#pauseComment").css("display", "none");
+        var reassignedValue = '';
+
+        $('select[name=ReAssignedTo]').change(function () {
+            reassignedValue = $('#ReAssignedTo option:selected').val();
+        });
+
+        var gridDataArray = [];
+        
+        //Submit Form
+        $('#brdFrm').submit(function () {
+            var requestIdval = $("#requestId").val();
+            var SNval = $("#SN").val();
+
+            var ijkl = 0;
+            $("table#datagrid tr").each(function (i) {
+                if (ijkl !== 0) {
+                    var value1 = $.trim($(this).find("td").eq(1).html());
+                    var value2 = $.trim($(this).find("td").eq(2).html());
+                    var value3 = $.trim($(this).find("td").eq(3).html());
+                    
+                    gridDataArray.push({ activity: value1, startDate: value2, endDate: value3 });
+                }
+                ijkl++;
+            });
+
+
+           // var draftBrdIsAvailable = 0;
+
+            //Validate document upload
+            //$('table#documentsTable tr').each(function () {
+            //    if ($.trim($(this).find("td").eq(4).html()) === "BRD") {
+            //        draftBrdIsAvailable++;
+            //        //return false;
+            //    }
+            //});
+
+            //submit process
+            if ($(".selectAction").val() === "Accept") {
+
+                if ($("#reviewStartDate").val() === "" || $("#roadmap").val() === "" || $("#internalRev").val() === ""
+                    || $("#externalRev").val() === "" || $("#ConceptInfo").val() === "") {
+                    swal("A required field is empty!", "Empty Field(s)", "error");
+                    return false;
+                }
+                if (gridDataArray.length === 0) {
+                    swal("Empty Section!", "You need to input Production Implementation Timelines", "error");
+                    return false;
+                }
+                //if (draftBrdIsAvailable === 0) {
+                //    swal("No Draft BRD uploaded!", "Empty Field(s)", "error");
+                //    return false;
+                //}
+                else
+                    //Accepted
+                {
+                    
+                    var dataObj = JSON.stringify({ conceptInfo: parseInt($("#ConceptInfo").val()), requestId: $("#requestId").val(), roadmap: parseInt($("#roadmap").val()), reviewStartDate: $("#reviewStartDate").val(), SN : $('#SN').val(), internalRev: $("#internalRev").val(), externalRev: $("#externalRev").val(), status: $("#status").val() });
+                    
+                    $("#submitBrdFrm").attr("disabled", "disabled");
+                   
+
+                    $.ajax({
+                        url: 'Product/SubmitDraftBrd',
+                        type: "POST",
+                        data: dataObj,
+                        cache: false,
+                        contentType: 'application/json, charset=utf-8',
+                        dataType: "json",
+                        success: function (result) {
+
+                            if (result.f != null) {
+
+                                swal(result.f, "!", "error");
+                                $("#submitBrdFrm").removeAttr("disabled");
+                            } else {
+                                swal({
+                                    title: "Success!",
+                                    text: result.s,
+                                    type: "success"
+                                });
+                                top.location.href = "/";
+                            }
+                        }
+                    });
+                }
+                //Reassign
+            } else if ($(".selectAction").val() === "Reassign") {
+                
+                if (reassignedValue === "" || reassignedValue === null) {
+                    swal("Select the person to assign the task to", "Empty Field(s)", "error");
+                    return false;
+                } else {
+                    $("#submitBrdFrm").attr("disabled", "disabled");
+                    $.ajax({
+                        url: '/Product/ReassignDraftBrd',//this.action,
+                        type: this.method,
+                        contentType: 'application/json, charset=utf-8',
+                        data: JSON.stringify({ requestId: requestIdval, assignedTo: reassignedValue, SN: SNval }),
+                        cache: false,
+                        dataType: "json",
+                        success: function (result) {
+
+                            if (result.f != null) {
+
+                                swal(result.f, "!", "error");
+
+                            } else {
+                                swal({
+                                    title: "Success!",
+                                    text: result.s,
+                                    type: "success"
+                                });
+                                top.location.href = "/";
+                            }
+                        }
+                    });
+
+                }
+            } else if ($(".selectAction").val() === "Pause") {
+                $(':input[type="submit"]').prop('disabled', true);
+                $.ajax({
+                    url: '/Product/RequestPause',//this.action,
+                    type: this.method,
+                    contentType: 'application/json, charset=utf-8',
+                    data: JSON.stringify({ SN: SNval, requestId: requestIdval,ApproverComment: $("#pauseComment").val()}),
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+
+                        if (result.f != null) {
+
+                            swal({
+                                title: "Failed!",
+                                text: result.f,
+                                type: "error"
+                            });
+
+
+                        } else {
+                            swal({
+                                title: "Success!",
+                                text: result.s,
+                                type: "success"
+                            });
+                            top.location.href = "/";
+                        }
+                    }
+                });
+            }
+
+
+
+
+            return false;
+        });
+    });
+</script>
+
+
+<script>
+    $(".Reassigned").css("display", "none");
+    $(".chosen-container").css("min-width", "180px");
+    $("#reviewStartDate, #st,#stp").datepicker();
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+
+    $('.selectAction').on('change', function () {
+        if (this.value === "Reassign") {
+            $("#pauseComment").css("display", "none");
+            disablePage();
+
+            $(".Reassigned").css("display", "block");
+            $(".chosen-container").css("width", "180px");
+
+        } else if (this.value === "Accept") {
+            $("#pauseComment").css("display", "none");
+            enablePage();
+            $(".Reassigned").css("display", "none");
+
+
+        } else if (this.value === "Pause") {
+            $("#pauseComment").css("display", "block");
+            $("#pauseComment").prop("required", true);
+            disablePage();
+        }
+
+
+    });
+
+    function disablePage() {
+
+        $("#reviewStartDate").removeAttr("required", true);
+        $("#roadmap").removeAttr("required", true);
+        $("#internalRev").removeAttr("required", true);
+        $("#externalRev").removeAttr("required", true);
+        $("#ConceptInfo").removeAttr("required", true);
+
+        $("#ReAssignedTo").prop("required", true);
+
+        $(".Reassigned").css("display", "none");
+        $("#rm").css("display", "none");
+        //$("#sla").css("display", "none");
+        $(".reviewStartDate").css("display", "none");
+        $("#sc").css("display", "none");
+        $("#brd").css("display", "none");
+        $(".prodTimeLine").css("display", "none");
+        $("#sfl").css("display", "none");
+
+    }
+
+    function enablePage() {
+        $(".Reassigned").css("display", "block");
+        $("#rm").css("display", "block");
+        //$("#sla").css("display", "block");
+        $(".reviewStartDate").css("display", "block");
+        $("#sc").css("display", "block");
+        $("#brd").css("display", "block");
+        $(".prodTimeLine").css("display", "block");
+        $("#sfl").css("display", "block");
+
+        $("#reviewStartDate").prop("required", true);
+        $("#roadmap").prop("required", true);
+        $("#internalRev").prop("required", true);
+        $("#externalRev").prop("required", true);
+        $("#ConceptInfo").prop("required", true);
+
+        $("#ReAssignedTo").removeAttr("required", true);
+    }
+
+    $(".add-row").click(function () {
+        
+        $(".add-row").attr("disabled", "disabled");
+        var impelemetInfoId = $('#datagrid tr:last-child td:nth-child(2)').html();
+
+
+        var activity = $("#ac option:selected").text();
+        var activityId = $("#ac option:selected").val();
+
+        if (activity === "" || $("#st").val() === "" || $("#stp").val() === "") {
+            swal("One or more fields is empty!", "Empty Field(s)", "error");
+            $(".add-row").removeAttr("disabled");
+            return false;
+        }
+        var start = new Date($("#st").val());
+
+        var stop = new Date($("#stp").val());
+        if (start > stop) {
+            swal("End date cannot be earlier than Start date", "Invalid Date Enrty", "error");
+            $(".add-row").removeAttr("disabled");
+            return false;
+        }
+
+        var timelineData = JSON.stringify({ ActivityName: activity, ActivityId: activityId, TimeLineStartDate: start, TimeLineEndDate: stop, RequestId: $("#requestId").val(), ImplementationInfoId: impelemetInfoId });
+        $.ajax({
+            type: "POST",
+            url: 'product/AddNewImplimentationTimeLine',
+            dataType: "json",
+            data: timelineData,
+            contentType: 'application/json, charset=utf-8',
+            processData: false,
+            success: function (result) {
+                if (result.f !== undefined) {
+                    swal(result.f, "!", "error");
+                    // $(".add-row").prop("disabled", false);
+                }
+                else if (result.s !== undefined) {
+                    var markup = "<tr><td class='hide id'>" + result.id + "</td><td class='hide'>" + impelemetInfoId + "</td><td><input  type='radio' name='record'></td><td>" + activity + "</td><td>" + $("#st").val() + "</td><td>" + $("#stp").val() + "</td></tr>";
+                    $("#datagrid tbody").append(markup);
+                    compact();
+                    $('#ac').prop('selectedIndex', 0);
+                    $("#st").val('');
+                    $("#stp").val('');
+                    //$(".add-row").prop("disabled", false);
+                }
+            }
+        });
+
+        $(".add-row").removeAttr("disabled");
+    });
+
+    // Find and remove selected table rows
+    $(".delete-row").click(function () {
+        $(".delete-row").prop("disabled", true);
+        $("#datagrid tbody").find('input[name="record"]').each(function () {
+            if ($(this).is(":checked")) {
+                var tr = $(this).parents("tr");
+                var iD = $(this).closest("tr")   // Finds the closest row <tr> 
+                       .find(".id")     // Gets a descendent with class="nr"
+                       .text();         // Retrieves the text within <td>
+
+
+                $.ajax({
+                    type: "POST",
+                    url: 'product/RemoveImplimentationTimeLine',
+                    dataType: "json",
+                    data: JSON.stringify({ id: iD }),
+                    contentType: 'application/json, charset=utf-8',
+                    processData: false,
+                    success: function (result) {
+                        if (result.f !== undefined) {
+                            swal(result.f, "!", "error");
+                        }
+                        else if (result.s !== undefined) {
+                            tr.remove();
+                        }
+                    }
+                });
+
+
+            }
+        });
+        compact();
+        $(".delete-row").prop("disabled", false);
+    });
+
+    function compact() {
+        var myTableArray = [];
+        $("#datagrid tr").each(function (i, v) {
+            var data = [];
+            var tableData = $(this).find('td');
+            if (tableData.length > 0) {
+                tableData.each(function () { data.push($(this).text()); });
+                myTableArray.push(data);
+            }
+        });
+
+        return myTableArray;
+    }
+    
+    $('#roadmap').on('change', function () {
+        //console.log($(this).attr("roadMasterId"));
+        var element = $(this).find('option:selected');
+        var roadMasterId = element.attr("roadMasterId");
+       
+        $('#ConceptInfo').empty();
+        if (this.value !== "000") {
+            //var request = this.value;
+            $.ajax({
+                type: "GET",
+                url: 'http://localhost:8011/api/RoadMapsApi/' + roadMasterId + '/master/',
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    if (result.length !== 0) {
+                    for (var i = 0; i < result.length; i++) {
+                        $('#ConceptInfo').append('<option value="' + result[i].Id + '">' + result[i].ConceptName + '</option>');
+                    }
+                    $('#ConceptInfo').val('').trigger('chosen:updated');
+                }
+                },
+                error: function (error) {
+                }
+            });
+        }
+    });
+
+
+
+</script>

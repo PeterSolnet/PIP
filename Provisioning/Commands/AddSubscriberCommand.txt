@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using log4net;
+using log4net.Config;
+using Provisioning.Commands.CommandInterfaces;
+using Provisioning.Commands.Model;
+using Provisioning.Commands.Receiver;
+using Provisioning.Expressions;
+using Provisioning.Receivers;
+using ProvisioningWebApi.Controllers.Api;
+using ProvisioningWebApi.Models;
+using ProvisioningWebApi.Services;
+//using TimelessGold.Controllers.Api;
+//using TimelessGold.Models;
+//using TimelessGold.Services;
+
+namespace Provisioning.Commands
+{
+    public class AddSubscriberCommand:CommandBase
+    {
+        protected static readonly ILog log = LogManager.GetLogger(typeof(AddSubscriberCommand));
+        GoldService service = new GoldService();
+        SubscribersApiController subscribersApi = new SubscribersApiController();
+        public AddSubscriberCommand(IReceiver receiver, string extra)
+            : base(receiver, extra)
+        {
+            XmlConfigurator.Configure();
+        }
+
+
+        public override CommandStatus Execute(ExpressionContext context)
+        {
+            var result = new CommandStatus();
+          
+            var args = GetArguments(context);
+            string couponId = Guid.NewGuid().ToString().Substring(0, 14);
+            var msisdn = args[0].ToString();
+            //var fullName = args[1].ToString();
+            var batchId =args[1];
+           // log.Info($"batch id of {userId}: {couponId}");
+            try
+            {
+                var subscriber = new Subscriber
+                                 {
+                                     Msisdn = msisdn,
+                                    // FullName = fullName,
+                                     BatchId = Convert.ToInt64(batchId),
+                                     DateRegistered = DateTime.Now,
+                                     CouponId = couponId,
+                                     UserName = HttpContext.Current.User.Identity.Name
+
+                };
+                subscribersApi?.PostSubscriber(subscriber);
+                result = new CommandStatus { StatusCode = CommandCode.Ok };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"{ex}");
+                result = new CommandStatus { StatusCode = CommandCode.Failed };
+                return result;
+            }
+
+           
+            //arguments passed from XML Config
+
+           
+
+
+        }
+    }
+}

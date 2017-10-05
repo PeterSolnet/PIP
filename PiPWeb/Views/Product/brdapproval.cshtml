@@ -1,0 +1,227 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model BrdInfo
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    
+    
+    var apiUrl = (string)TempData["apiUrl"];
+    
+    var conceptDetails = new ConceptInfo();
+    if (TempData["conceptInfo"] != null)
+    {
+        conceptDetails = (ConceptInfo)TempData["conceptInfo"];
+
+
+    }
+}
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<link href="~/Styles/sweetalert.css" rel="stylesheet"/>
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+<section id="home">
+<div class="green-header">
+    <h4>BRD Draft Stage Page</h4>
+</div>
+    @{
+        var user = new ADModel();
+    }
+    <div class="container">
+        <div class="main-content">
+            <div>
+
+                @using (Html.BeginForm("PauseActionApproval", "Product", FormMethod.Post, new { id = "brdFrm", role = "form" }))
+                {
+
+                    
+                    <div class="col-xs-12 info" style="margin-top: 5px;">
+                        <p class="col-md-4 col-xs-12"></p>
+
+                        <input type="hidden" id="requestId" name="requestId" value='@Model.RequestId'/>
+                        <input type="hidden" id="SN" name="SN" value='@Model.SN'/>
+                        
+                        @{
+                    
+                            if (TempData["aduser"] != null)
+                            {
+                                user = (ADModel)TempData["aduser"];
+                                    <p class="col-md-4 col-xs-12" id="username">@user.UserName</p>
+                                    <p class="col-md-4 col-xs-12">@user.Email</p>
+                            }
+
+                        }
+
+                    </div>
+                    <div class="sub-green col-xs-12 mt20">
+                        <h4>Concept Details</h4>
+                    </div>
+                    <div class="col-xs-12 info">
+                        <p class="col-md-4 col-xs-12">Concept Owner</p>
+                        <p class="col-md-4 col-xs-12">Concept Initiator</p>
+                        <p class="col-md-4 col-xs-12">Product Description</p>
+
+
+
+                        @{
+                   
+                            <p class="col-md-4 col-xs-12">@conceptDetails.ConceptOwner</p>
+                            <p class="col-md-4 col-xs-12">@conceptDetails.OriginatorUserName</p>
+                            <p class="col-md-4 col-xs-12">@conceptDetails.ProductDescription</p>
+
+
+
+                        }
+                    </div>
+                    <div class="sub-green col-xs-12 mt20">
+                        <h4 class="pull-left">Attached Documents</h4>
+                        <i class="fa fa-chevron-up pull-right pt10"></i>
+                    </div>
+                    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                        <table class="table" style="border: 0; height: auto;">
+                            <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+                    var attchedfiles = new List<DocumentInfo>();
+                    if (TempData["documentInfoList"] != null)
+                    {
+                        attchedfiles = (List<DocumentInfo>)TempData["documentInfoList"];
+                    }
+                    foreach (var item in attchedfiles)
+                    {
+                        var docDesc = item.DocumentDescription != null ? item.DocumentDescription : "NA";
+                                    <tr>
+                                        <td><a href="@item.DocumentPath" target="_blank">@item.DocumentName</a></td>
+
+                                        <td>@docDesc</td>
+                                    </tr>
+                    }
+                            }
+                            </tbody>
+                        </table>
+
+                    </div>
+                    
+                                        <div class="sub-green col-xs-12 mt20">
+                        <h4 class="pull-left">Action History</h4>
+                        <i class="fa fa-chevron-up pull-right pt10"></i>
+                    </div>
+                    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                        <table class="table" style="border: 0; height: auto;">
+                            <thead>
+                                <tr>
+                                    <th>Arrival Time</th>
+                                    <th>Action Time</th>
+                                    <th>Activity</th>
+                                    <th>Action</th>
+                                    <th>Participant</th>
+                                    <th>Destination User</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                    var actionHistory = new List<ActionHistoryInfo>();
+                    if (TempData["actionHistory"] != null)
+                    {
+                        actionHistory = (List<ActionHistoryInfo>)TempData["actionHistory"];
+                        foreach (var item in actionHistory)
+                        {
+                                    <tr>
+                                        <td>@Convert.ToDateTime(item.WorkListArrivalTime).ToString("dd/MM/yy hh:mm tt")</td>
+                                        <td>@Convert.ToDateTime(item.ActionTimeStamp).ToString("dd/MM/yy hh:mm tt")</td>
+                                        <td>@item.Activity</td>
+                                        <td>@item.Action</td>
+                                        <td>@item.Participant</td>
+                                        <td>@item.DestinationUser</td>
+                                        <td>@item.Comment</td>
+                                    </tr>
+                        }
+                    }
+                   
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+
+
+                    <div class="col-md-12"style="margin-bottom:12px;"></div>
+                    <div class="prodTimeLine">
+
+
+
+
+                        <p></p>
+                        <div class="col-xs-12 info">
+                            <div class="form-group col-md-3 col-xs-12">
+                                <label>Action</label><br>
+                                @{
+                                     if (TempData["K2ActionName"] != null)
+                                        {
+                                            var actionName = (List<string>) TempData["K2ActionName"];
+                
+
+                                        <select id="status" name="action" class="form-control dropdown" style="width: 180px;">
+                                            @foreach (var item in actionName)
+                                            {
+                                                <option value="@item">@item</option>
+                                            }
+                                        </select>}
+                                        }
+                                
+                               
+                            </div>
+                            </div>
+
+                    </div>
+                    <p class="col-xs-12 form-group"></p>
+                    <div class="col-xs-12 form-group">
+                        <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitBrdFrm">SUBMIT</button>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+</section>
+<script>
+
+$('#brdFrm').submit(function() {
+    $.ajax({
+        url: this.action,
+        type: this.method,
+        data: this.serialize(),
+        cache: false,
+        dataType: "json",
+        success: function (result) {
+
+            if (result.f != null) {
+
+                swal(result.f, "!", "error");
+
+            } else {
+                swal({
+                    title: "Success!",
+                    text: result.s,
+                    type: "success"
+                });
+            }
+        }
+    });
+
+});
+            
+
+</script>

@@ -1,0 +1,180 @@
+﻿@using K2.WebApi.Models
+@model ConceptInfo
+
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+   
+    var documentInfos = TempData["DocumentInfos"];
+    var docInfos = (List<DocumentInfo>) documentInfos;
+    
+
+   
+    
+    
+}
+<link href="~/Styles/sweetalert.css" rel="stylesheet"/>
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+
+<section class="container-fluid pl0 pr0">
+<div class="green-header"><h4>Concept Acceptanc/Rejection Form</h4></div>
+<div class="form col-md-12 container-fluid">
+@using (Html.BeginForm("ApproveConceptRequest", "Concept", FormMethod.Post, new { id = "formSubmit" }))
+{
+    <input type="hidden" id="requestId" value="@Model.RequestId" name="requestId"/>
+    
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Concept Detials</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info">
+        <div class="form-group col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <label>Concept Owner</label><br>
+                @Model.ConceptOwner
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <label>Concept Initiator</label><br>
+                @Model.OriginatorName
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <label>Product Description</label><br><br/>
+                @Model.ProductDescription
+            </div>
+        </div>
+    </div>
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Attachements</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    @*<div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>File</th>
+                <th>Description</th>
+            </tr>
+            <tbody>
+
+           
+                <tr>
+                    <td>></td>
+                    <td></td>
+                </tr>
+            
+
+
+            </tbody>
+        </table>
+    </div>*@
+    <div class="sub-green col-xs-12 mt20">
+        <input type="hidden" id="SN" name="SN" value="@Model.SN"/>
+        <input type="hidden" id="Id" name="Id" value="@Model.Id"/>
+        <h4 class="pull-left">Action History</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    @*<div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+        <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+            <table id="documentsTable" class="stripe">
+                <thead>
+                <tr>
+                    <th class="gray">Timestamp</th>
+                    <th class="gray">Activities</th>
+                    <th class="gray">Participants</th>
+                    <th class="gray">Comments</th>
+                    <th class="gray">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>*@
+
+
+    <div class="sub-green col-xs-12 mt20">
+        <h4 class="pull-left">Workflow Approver's Action</h4>
+        <i class="fa fa-chevron-up pull-right pt10"></i>
+    </div>
+    <div class="col-xs-12 info">
+        <p class="col-xs-12">Actions</p>
+         <div class="form-group">
+            @{
+                if (TempData["K2ActionName"] != null)
+                {
+                    var actionName = (List<string>) TempData["K2ActionName"];
+                
+
+                <select id="ApprovalAction" name="ApprovalAction" class="form-control dropdown" style="width: 180px;">
+                    @foreach (var item in actionName)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </select>}
+                }
+        </div>
+        <p class="col-xs-12">Comments</p>
+        <div class="form-group col-xs-12 col-md-4">
+            <textarea id="ApproverComment" name="ApproverComment" rows="5" class="form-control col-md-3 col-xs-12"></textarea>
+        </div>
+    </div>
+    <div class="col-xs-12 form-group">
+        <button type="submit" id="clear" class="btn btn-primary col-md-offset-5 col-md-2 col-xs-12 mr10">CANCEL</button>
+        <button type="submit" id="submitBtn" name="submitBtn" class="btn btn-primary col-md-2 col-xs-12">SUBMIT</button>
+    </div>
+}
+</div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        $("#formSubmit").submit(function () {
+           
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    // alert("correct");
+                    //swal(result.s, "", "success");
+                    toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "positionClass": "toast-top-right",
+                        "onclick": null,
+                        "showDuration": "1000",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    };
+                    if (result.f != null) {
+                        toastr.error(result.f, "K2 Product Implementation Process");
+                    } else {
+                       
+                        //$('#CancelBtn').attr("disabled", "disabled");
+                        $('#submitBtn').attr("disabled", "disabled");
+                        toastr.success(result.s, "K2 Product Implementation Process");
+                    }
+
+                }
+
+            });
+            return false;
+        });
+    });
+
+</script>

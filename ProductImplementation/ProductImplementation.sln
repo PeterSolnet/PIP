@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{D50D8A3F-5CE1-4E89-9491-F84FAB0E386A}") = "ProductImplementation", "ProductImplementation\ProductImplementation.k2proj", "{5849D17E-6493-4370-AC8B-C32D64E24EC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Provisioning", "..\Provisioning\Provisioning.csproj", "{DEBD709C-D879-4A8D-AF3B-0F4DE58DECE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiPWeb", "..\PiPWeb\PiPWeb.csproj", "{27B5EF31-CE64-49ED-80BB-48F524BEC2B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{43315656-4D9B-4438-B742-839906299B88}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K2.WebApi", "..\K2.WebApi\K2.WebApi.csproj", "{B1C40E5B-8EA6-441D-81D7-951A08C53DD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K2.SdpService", "..\K2.SdpService\K2.SdpService.csproj", "{8BF1999E-9209-4A56-A42F-B11C26DE3A6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5849D17E-6493-4370-AC8B-C32D64E24EC0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DEBD709C-D879-4A8D-AF3B-0F4DE58DECE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEBD709C-D879-4A8D-AF3B-0F4DE58DECE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEBD709C-D879-4A8D-AF3B-0F4DE58DECE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEBD709C-D879-4A8D-AF3B-0F4DE58DECE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27B5EF31-CE64-49ED-80BB-48F524BEC2B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27B5EF31-CE64-49ED-80BB-48F524BEC2B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27B5EF31-CE64-49ED-80BB-48F524BEC2B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27B5EF31-CE64-49ED-80BB-48F524BEC2B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C40E5B-8EA6-441D-81D7-951A08C53DD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C40E5B-8EA6-441D-81D7-951A08C53DD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C40E5B-8EA6-441D-81D7-951A08C53DD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C40E5B-8EA6-441D-81D7-951A08C53DD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BF1999E-9209-4A56-A42F-B11C26DE3A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BF1999E-9209-4A56-A42F-B11C26DE3A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BF1999E-9209-4A56-A42F-B11C26DE3A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BF1999E-9209-4A56-A42F-B11C26DE3A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

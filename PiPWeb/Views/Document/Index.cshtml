@@ -1,0 +1,197 @@
+﻿@using K2.WebApi.Models
+@model dynamic
+@{
+
+                        //Layout = null;
+}
+
+
+<link href="~/Styles/sweetalert.css" rel="stylesheet" />
+<link href="~/Content/themes/base/selectable.css" rel="stylesheet" />
+<link href="~/Content/themes/base/autocomplete.css" rel="stylesheet" />
+<link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+@*<link href="~/Content/themes/default/easyui.css" rel="stylesheet"/>*@
+<link href="~/Content/chosen/chosen.min.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+@*<link href="~/Content/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>*@
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/buttons.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.semanticui.min.css" rel="stylesheet" />
+
+
+<div class="sub-green col-xs-12 mt20">
+    <h4 class="pull-left">Document Upload</h4>
+    <i class="fa fa-chevron-up pull-right pt10"></i>
+</div>
+
+<div class="col-xs-12 info">
+    <div class="col-md-6">
+        <div class="form-group">
+            <input type="file" id="FileUpload" class="btn btn-tertiary mr-xs mb-lg" />
+
+
+
+        </div>
+        <div class="form-group">
+
+            <input type="text" class="form-control" placeholder="Document Name" id="documentName" name="documentName" style="width: 380px"/>
+        </div>
+        <div class="form-group">
+
+            <textarea class="form-control" cols="4" rows="6" placeholder="Enter the Document Description" id="documentDescription" name="documentDescription" style="width: 380px"></textarea>
+        </div>
+
+        <div class="form-group">
+            <div class="col-lg-3">Document Type </div>
+            <div class="col-lg-7" style="width: 180px !important">
+
+                <select class="chosen-select" id="documentTypeId" name="documentTypeId" data-placeholder="Select Document Type...">
+                    @if (TempData["documentTypeList"] != null)
+                    {
+                        var documentTypeList = (List<DocumentTypeInfo>)TempData["documentTypeList"];
+
+                        foreach (var item in documentTypeList)
+                        {
+                        <option value="@item.Id">@item.DocumentType</option>
+                        }
+                    }
+
+                </select>
+
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <input type="button" id="Upload" value="Upload" class="btn btn-success" />
+    </div>
+    <div class="form-group">
+        
+    </div>
+</div>
+<br/>
+
+<div class="row">
+    <div class="panel panel-default">
+           
+            <div class="panel-body">
+                <table id="documentsTable" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th nowrap="nowrap">Document Name</th>
+                        <th nowrap="nowrap">Document Type</th>
+                        
+                        <th>Tag</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th >No</th>
+                        <th>Document Name</th>
+                        <th>Document Type</th>
+                       
+                        <th>Tag</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <tr>
+                    <td></td>
+                    <td nowrap="nowrap"></td>
+                    <td nowrap="nowrap"></td>
+                   
+                    <td nowrap="nowrap"></td>
+                    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+
+
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/sweetalert.min.js"></script>
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.bootstrap.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.buttons.min.js"></script>
+
+<script src="~/Content/chosen/chosen.jquery.min.js"></script>
+<script src="~/Content/chosen/chosen.proto.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#Upload").click(function () {
+            var formData = new FormData();
+            var documentName = $("#documentName").val();
+            var documentTypeId = $("#documentTypeId").val();
+            var documentDescription = $("#documentDescription").val();
+            $('#Upload').attr("disabled", "disabled");
+            var totalFiles = document.getElementById("FileUpload").files.length;
+            for (var i = 0; i < totalFiles; i++) {
+                var file = document.getElementById("FileUpload").files[i];
+
+                formData.append("FileUpload", file);
+            }
+            formData.append("documentTypeId", documentTypeId);
+            formData.append("documentName", documentName);
+            formData.append("documentDescription", documentDescription);
+            $.ajax({
+                type: "POST",
+                url: '/Document/Upload',
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    
+                    if (result.f != null) {
+                        //toastr.error(result.f, "K2 Product Implentation Process");
+                        swal(result.f, "", "error");
+                        $('#Upload').prop('disabled', false);
+
+                    } else {
+                        swal(result.s, "", "success");
+                        $('#documentsTable').DataTable().ajax.reload();
+                        //$('#Upload').attr("enabled", "enabled");
+                        $('#Upload').prop('disabled', false);
+                        //toastr.success(result.s, "K2 Product Implentation Process");
+                    }
+                   
+                }
+            });
+            return false;
+        });
+    });
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#documentsTable').DataTable({
+            
+            "processing": true,
+           // "sScrollY": "100px",
+            "ajax": "/Document/GetDocumentInfoListAsync",
+            "columns": [
+            { "data": "Id" },
+            { "data": "DocumentName" },
+            { "data": "DocumentTypeId" },
+           
+            { "data": "Tag" }
+
+            ]
+            //"bServerSide": true
+            //"sAjaxSource": "/FileUpload/GetMyPhotos"
+        });
+    });
+</script>
+<script>
+
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "95%" });
+</script>

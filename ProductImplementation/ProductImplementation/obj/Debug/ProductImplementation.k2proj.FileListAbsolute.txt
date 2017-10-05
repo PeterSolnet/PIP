@@ -1,0 +1,2 @@
+C:\Projects\PIP\ProductImplementation\ProductImplementation\bin\Debug\ProductImplementation.dll
+C:\Projects\PIP\ProductImplementation\ProductImplementation\obj\Debug\ProductImplementation.dll

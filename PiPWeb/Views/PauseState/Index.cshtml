@@ -1,0 +1,120 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model PauseInfo
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string serialNumer = string.Empty;
+
+    if (TempData["SN"] != null)
+    {
+        serialNumer = (string)TempData["SN"];
+    }
+}
+
+
+
+<section id="home">
+                <div class="green-header"><h4>BRD Stage Initiation Page</h4></div>
+
+    <div class="container">
+        <div class="main-content">
+
+
+            <div>
+
+                @using (Html.BeginForm("Update", "PauseState", FormMethod.Post, new { id = "pauseStateFrm", role = "form" }))
+                {
+
+                    <input type="text" id="SN" value="@serialNumer"/>
+                    <input type="text" id="requestId" name="requestId" value="@Model.RequestId"/>
+                    <div class="col-xs-12 info" style="margin-top: 5px;">
+                        <p class="col-md-4 col-xs-12"></p>
+                        <input type="hidden" value="BRD" id="tag" name="tag"/> 
+                        
+
+
+                    </div>
+
+                    <div class="sub-green col-xs-12 mt20">
+                            <h4 class="pull-left">Production Implementation Timelines</h4>
+                            <i class="fa fa-chevron-up pull-right pt10"></i>
+                            </div>
+                    <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                        <table class="table" style="border: 0; height: auto;" id="datagrid">
+                            <thead>
+                            <tr>
+                                <th  class="hide">ID</th>
+                                <th>Tag</th>
+                                <th>Initiator</th>
+                                <th>Status</th>
+                                <th>Date Paused</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                                        @{
+                    
+                    if (@Model != null)
+                    {
+                         <tr>
+                                    <td class="hide">@Model.Id</td>
+                                    <td>@Model.Tag</td>
+                                    <td>@Model.Actor</td>
+                                    <td>@Model.Status</td>
+                                    <td>@Model.DatePaused</td>
+                                    <td><button style=""  type="button" class="btn btn-info resume">Resume</button></td>
+                                </tr>
+
+                    }
+             }
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="col-xs-12 form-group" style="margin-top:20px; float:right;">
+                    </div>
+
+                }
+            </div>
+           
+        </div>
+    </div>
+
+</section>
+<script>
+
+    $("#datepicker, #st,#stp").datepicker();
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+        $(".resume").click(function () {
+             $cells = $(this).closest("tr").children('td.hide').text();
+                $.ajax({
+                    url: '/PauseState/Update',//'?pauseRef=' + $cells + '&SN=' + $("#SN"),
+                    type: "POST",
+                    dataType: "json",
+                    data: JSON.stringify({ pauseRef: $cells, SN: $("#SN").val() }),
+                    contentType: 'application/json, charset=utf-8',
+                    success: function (result) {
+
+                        if (result.f != null) {
+
+                            swal(result.f, "!", "error");
+
+                        } else {
+
+                            swal({
+                                title: "Success!",
+                                text: result.s,
+                                type: "success"
+                            });
+
+                        }
+
+                    }
+                });
+
+                return false;
+            }); 
+</script>

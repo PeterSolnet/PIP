@@ -1,0 +1,66 @@
+﻿@model System.Collections.Generic.List<K2.WebApi.Models.K2WorkListItem>
+
+@{
+    ViewBag.Title = "title";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="panel">
+        <div class="col-md-12">
+            <table id="example" class="ui celled table">
+                <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Folio</th>
+                    <th>Task</th>
+                    <th>Originator</th>
+                    <th>Event Name</th>
+                    <th>Event Start date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Folio</th>
+                    <th>Task</th>
+                    <th>Originator</th>
+                    <th>Event Name</th>
+                    <th>Event Start date</th>
+                    <th>Status</th>
+                </tr>
+                </tfoot>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@Html.ActionLink("View","Review",new {SN=item.SN})</td>
+                        <td>@item.Folio</td>
+                        <td>@item.ActivityName</td>
+                        <td>@item.OriginatorName</td>
+                        <td>@item.EventName</td>
+                        <td>@item.EventStartDate</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+                    
+                <br/>
+                
+
+
+
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('#example').DataTable();
+});
+
+</script>

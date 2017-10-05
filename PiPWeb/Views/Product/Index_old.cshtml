@@ -1,0 +1,744 @@
+﻿@using System.Web.Script.Serialization
+@using K2.WebApi.Models
+@using Microsoft.AspNet.Identity
+@model BrdInfo
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var apiUrl = (string)TempData["apiUrl"];
+
+    var conceptInfo = new ConceptInfo();
+    if (TempData["conceptInfo"] != null)
+    {
+        conceptInfo = (ConceptInfo)TempData["conceptInfo"];
+
+
+    }
+}
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<link href="~/Styles/sweetalert.css" rel="stylesheet" />
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/buttons.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.semanticui.min.css" rel="stylesheet" />
+<section id="home">
+    <div class="green-header">
+        <h4>BRD Draft Stage Page</h4>
+    </div>
+    @{
+        var user = new ADModel();
+    }
+    <div class="container">
+        <div class="main-content">
+
+            <div>
+
+                @using (Html.BeginForm("SubmitDraftBrd", "Product", FormMethod.Post, new { id = "brdFrm", role = "form" }))
+                {
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active"><a href="#conceptTab" data-toggle="tab">Concept Information</a></li>
+                        <li role="presentation"><a href="#ReviewerTab" data-toggle="tab">Reviewers</a></li>
+                        <li role="presentation"><a href="#ActionHistoryTab" data-toggle="tab">Action History</a></li>
+                        <li role="presentation"><a href="#documentsTab" data-toggle="tab">Document(s)</a></li>
+                        <li role="presentation"><a href="#documentstatusTab" data-toggle="tab">Status</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="conceptTab">
+                            <div>
+                                <p class="col-md-4 col-xs-12"></p>
+
+                                <input type="hidden" id="requestId" name="requestId" value='@Model.RequestId'/>
+                                <input type="hidden" id="SN" name="SN" value='@Model.SN'/>
+
+
+
+                            </div>
+                            <div class="sub-green col-xs-12 mt20">
+                                <h4>Concept Details</h4>
+                            </div>
+                            <div class="col-xs-12 info">
+                                <p class="col-md-4 col-xs-12">Concept Owner</p>
+                                <p class="col-md-4 col-xs-12">Concept Initiator</p>
+                                <p class="col-md-4 col-xs-12">Product Description</p>
+
+
+
+                                @{
+
+                                    <p class="col-md-4 col-xs-12">@conceptInfo.ConceptOwner</p>
+                                    <p class="col-md-4 col-xs-12">@conceptInfo.OriginatorUserName</p>
+                                    <p class="col-md-4 col-xs-12">@conceptInfo.ProductDescription</p>
+
+
+
+                                }
+                            </div>
+                            <div class="sub-green col-xs-12 mt20">
+                                <h4 class="pull-left">BRD Details</h4>
+                                <i class="fa fa-chevron-up pull-right pt10"></i>
+                            </div>
+                            <div class="col-xs-12 info">
+                                <div class="form-group col-md-4 pull-right col-xs-12" id="rm">
+                                    <label>Select Road Map</label><br>
+                                    <select class="col-xs-12 chosen-select" id="roadmap" name="roadmap" data-placeholder="Select Brd ..">
+                                        <option value="000">Select a Road Map</option>
+                                        @{
+                                            var currentRoadMaps = new List<RoadMapMaster>();
+                                            if (TempData["currentRoadMaps"] != null)
+                                            {
+                                                currentRoadMaps = (List<RoadMapMaster>) TempData["currentRoadMaps"];
+                                            }
+                                            foreach (var item in currentRoadMaps)
+                                            {
+                                                <option value="@item.Id">@item.RoadMapName : @item.StartDate.ToString("dd MMMM") - @item.EndDate.ToString("dd MMMM")</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                @{
+
+                                    if (TempData["taskInfoList"] != null)
+                                    {
+                                        var taskInfoList = (List<TaskInfo>) TempData["taskInfoList"];
+                                        <div class="col-md-2 form-group col-xs-12">
+                                            <label>Priority Level</label><br>
+                                            <p style="color: #A9A9A9;">
+                                            @foreach (var item in taskInfoList)
+                                            {
+                                                if (@item.Assignee.ToString().Trim() == @user.UserName.ToString().Trim())
+                                                {<text>@item.TaskPriority</text>
+                                                }
+                                            }
+                                            <p>
+                                        </div>
+                                    }
+
+                                }
+
+
+
+
+                                <div class="col-md-2 form-group col-xs-12">
+                                    <label>Select an Action to perform</label><br>
+                                    <select class="col-xs-12 chosen-select selectAction" name="Action" data-placeholder="Select Action ..">
+                                        <option value="Accept">Accept</option>
+                                        <option value="Reassign">Reassign</option>
+                                        <option value="Pause">Pause</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 form-group col-xs-12">
+                                    <label></label>
+                                    <br>
+                                    <textarea rows="8" cols="50" id="pauseComment" placeholder="Comment" name="pauseComment"></textarea>
+                                </div>
+
+
+                                <div class="col-md-2 form-group col-xs-12 Reassigned">
+                                    <label>Task Re-Assigned to</label><br>
+                                    <select class="col-xs-12 chosen-select" id="ReAssignedTo" name="ReAssignedTo" data-placeholder="Select User ..">
+                                        @{
+                                            var adUserList2 = new List<ADModel>();
+                                            if (TempData["aduserList"] != null)
+                                            {
+                                                adUserList2 = (List<ADModel>) TempData["aduserList"];
+                                            }
+                                            foreach (var item in adUserList2)
+                                            {
+                                                <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 form-group col-xs-12 reviewStartDate">
+                                    <label>Review Meeting Date</label><br>
+                                    <input class="form-control" id="reviewStartDate" name="reviewStartDate">
+                                </div>
+
+                                <div class="col-md-4 form-group pull-right col-xs-12" id="sc">
+                                    <label>Select Concept</label><br>
+                                    <select class="form-control chosen-select" id="conceptInfoId" name="conceptInfoId" data-placeholder="Select Concept ..">
+                                    </select>
+                                </div>
+
+
+                            </div>
+                            <div id="brd">
+                                <div class="sub-green col-xs-12 mt20">
+                                    <h4 class="pull-left">Add BRD Reviewers</h4>
+                                    <i class="fa fa-chevron-up pull-right pt10"></i>
+                                </div>
+                                <div class="col-xs-12 info">
+                                    <div class="form-group col-md-6 col-xs-12">
+                                        <label>Internal Reviewers</label><br>
+                                        <select class="form-control chosen-select" id="internalRev" multiple name="internalRev" data-placeholder="Select Reviewers ..">
+                                            @{
+                    var adUserList1 = new List<ADModel>();
+                    if (TempData["adUserList"] != null)
+                    {
+                        adUserList1 = (List<ADModel>)TempData["aduserList"];
+                    }
+                    foreach (var item in adUserList1)
+                    {
+
+                                                <option value="@item.UserName">@item.FirstName &nbsp;@item.LastName</option>
+                    }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6 col-x-s12">
+                                        <label>External Reviewers Email(s) (<small>e.g example@gmail.com;tundea@yahoo.com</small>)</label><br>
+                                        <input type="text" class="form-control" placeholder="Enter reviewer email" id="externalRev" name="externalRev">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 info">
+                                <div class ="col-md-4"></div>
+                                 <div class ="col-md-4"></div>
+                                 <div class ="col-md-4"><a href="#ReviewerTab" data-toggle="tab" class="btn btn-success">Next</a></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="ReviewerTab">
+                            
+
+                            <div class="prodTimeLine">
+
+                                <div class="sub-green col-xs-12 mt20">
+                                    <h4 class="pull-left">Production Implementation Timelines</h4>
+                                    <i class="fa fa-chevron-up pull-right pt10"></i>
+                                </div>
+                                <div class="col-xs-12 info" style="padding-top: 0; padding-right: 0; padding-left: 0;">
+                                    <table class="table" style="border: 0; height: auto;" id="datagrid">
+                                        <thead>
+                                        <tr>
+                                            <th>Action</th>
+                                            <th>Activity</th>
+                                            <th>Start Date</th>
+
+                                            <th>End Date</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+
+                                    <p class="col-md-3 col-xs-12">
+                                    </p>
+                                    <p class="col-md-3 col-xs-12">
+                                        <input type="text" class="form-control" placeholder="Activities" id="ac">
+                                    </p>
+                                    <p class="col-md-3 col-xs-12">
+                                        <input type="text" class="form-control" placeholder="Start Date" id="st">
+                                    </p>
+                                    <p class="col-md-3 col-xs-12">
+                                        <input type="text" class="form-control" placeholder="Stop Date" id="stp">
+                                    </p>
+
+                                    <div class="form-group col-xs-12 mt20">
+                                        <button type="button" class="btn btn-export col-md-1 mr20 col-xs-12 add-row">Add</button>
+                                        <button type="button" class="btn btn-export col-md-1 col-xs-12 delete-row">Remove</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 info">
+                                 <div class ="col-md-4"><a href="#conceptTab" data-toggle="tab" class="btn btn-success">Back</a></div>
+                                <div class="col-md-4"></div>
+                                 <div class ="col-md-4"> <a href="#ActionHistoryTab" data-toggle="tab" class="btn btn-success">Next</a></div>
+                                
+                               
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="ActionHistoryTab">
+                            <div class="sub-green col-xs-12 mt20">
+                                <h4 class="pull-left">Action History</h4>
+                                <i class="fa fa-chevron-up pull-right pt10"></i>
+                            </div>
+                            <div class="col-xs-12 info">
+                                <table id="actionHistoryTable" class="display">
+                                    <thead>
+                                    <tr>
+                                        <th>Arrival Time</th>
+                                        <th>Action Time</th>
+                                        <th>Activity</th>
+                                        <th>Action</th>
+                                        <th>Participant</th>
+                                        <th>Destination User</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @{
+                                        var actionHistoryInfoList = new List<ActionHistoryInfo>();
+                                        if (TempData["actionHistoryInfoList"] != null)
+                                        {
+                                            actionHistoryInfoList = (List<ActionHistoryInfo>) TempData["actionHistoryInfoList"];
+                                            foreach (var item in actionHistoryInfoList)
+                                            {
+                                                <tr>
+                                                    <td>@item.WorkListArrivalTime</td>
+                                                    <td>@item.ActionTimeStamp</td>
+                                                    <td>@item.Activity</td>
+                                                    <td>@item.Action</td>
+                                                    <td>@item.Participant</td>
+                                                    <td>@item.DestinationUser</td>
+                                                    <td>@item.Comment</td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <div class="col-xs-12 info">
+                                 <div class ="col-md-4"><a href="#ReviewerTab" data-toggle="tab" class="btn btn-success">Back</a></div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                   <a href="#documentsTab" data-toggle="tab" class="btn btn-success">Next</a>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="documentsTab">
+                            <div class="sub-green col-xs-12 mt20">
+                                <h4 class="pull-left">Attached Documents</h4>
+                                <i class="fa fa-chevron-up pull-right pt10"></i>
+                            </div>
+                            <div class="col-xs-12 info">
+                                <table class="display" id="attachedDocsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>File</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                    var attchedfiles = new List<DocumentInfo>();
+                    if (TempData["documentInfoList"] != null)
+                    {
+                        attchedfiles = (List<DocumentInfo>)TempData["documentInfoList"];
+                    }
+                    foreach (var item in attchedfiles)
+                    {
+                        var docDesc = item.DocumentDescription ?? "NA";
+                                            <tr>
+                                                <td><a href="@item.DocumentPath" target="_blank">@item.DocumentName</a></td>
+
+                                                <td>@docDesc</td>
+                                            </tr>
+                    }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+
+                            @Html.Partial("~/Views/Document/Index.cshtml")
+
+
+                            <div class="col-md-12">
+                                 <div class ="col-md-4"><a href="#ActionHistoryTab" data-toggle="tab" class="btn btn-success">Back</a></div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                   <a href="#documentstatusTab" data-toggle="tab" class="btn btn-success">Next</a>
+                                    
+                                </div>
+                               
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="documentstatusTab">
+                            <div class="col-xs-12 info">
+                                <div style="width: 180px !important">
+                                    <label>Document Status</label><br>
+                                    <select class="chosen-select" id="status" name="status" data-placeholder="Select Document Type...">
+                                        <option selected value="Draft BRD">Draft BRD</option>
+                                        <option value="Baselined BRD">Baselined BRD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+
+
+                                <div class="col-xs-12 form-group">
+                                    <a href="#conceptTab" data-toggle="tab" class="btn btn-success col-md-offset-5 col-md-2 col-xs-12 mr10">CANCEL</a>
+                                    @*<button type="reset" class="btn btn-success col-md-offset-5 col-md-2 col-xs-12 mr10" id="can">CANCEL</button>*@
+                                    <button type="submit" class="btn  btn-success col-md-2 col-xs-12 mr10" id="sfl">SAVE FOR LATER</button>
+                                    <button type="submit" class="btn  btn-success col-md-2 col-xs-12" id="submitBrdFrm">SUBMIT</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+
+                    
+
+                    
+
+                    
+                    <p class="col-xs-12 form-group"></p>
+                    
+                }
+            </div>
+
+        </div>
+    </div>
+
+</section>
+<script>
+
+    $(function () {
+
+        $("#test").click(function () {
+            compact();
+        });
+
+        $("#reviewStartDate").prop("required", true);
+        $("#roadmap").prop("required", true);
+        $("#internalRev").prop("required", true);
+        $("#externalRev").prop("required", true);
+        $("#conceptInfoId").prop("required", true);
+        $("#ReAssignedTo").prop("required", true);
+        $("#pauseComment").css("display", "none");
+        var reassignedValue = '';
+
+        $('select[name=ReAssignedTo]').change(function () {
+            reassignedValue = $('#ReAssignedTo option:selected').val();
+        });
+
+        var gridDataArray = [];
+
+        //Submit Form
+        $('#brdFrm').submit(function () {
+            var requestIdval = $("#requestId").val();
+            var SNval = $("#SN").val();
+
+            var ijkl = 0;
+            $("table#datagrid tr").each(function (i) {
+                if (ijkl !== 0) {
+                    var value1 = $.trim($(this).find("td").eq(1).html());
+                    var value2 = $.trim($(this).find("td").eq(2).html());
+                    var value3 = $.trim($(this).find("td").eq(3).html());
+
+                    gridDataArray.push({ activity: value1, startDate: value2, endDate: value3 });
+                }
+                ijkl++;
+            });
+
+
+            //var draftBrdIsAvailable = 0;
+
+            ////Validate document upload
+            //$('table#documentsTable tr').each(function () {
+            //    if ($.trim($(this).find("td").eq(4).html()) === "BRD") {
+            //        draftBrdIsAvailable++;
+            //        //return false;
+            //    }
+            //});
+
+            //submit process
+            if ($(".selectAction").val() === "Accept") {
+
+                $(".chosen-container").css("width", "180px");
+
+                if ($("#reviewStartDate").val() === "" || $("#roadmap").val() === "" || $("#internalRev").val() === ""
+                    || $("#externalRev").val() === "" || $("#conceptInfoId").val() === "") {
+                    swal("A required field is empty!", "Empty Field(s)", "error");
+                    return false;
+                }
+                if (gridDataArray.length === 0) {
+                    swal("Empty Section!", "You need to input Production Implementation Timelines", "error");
+                    return false;
+                }
+                    //if (draftBrdIsAvailable === 0) {
+                    //    swal("No Draft BRD uploaded!", "Empty Field(s)", "error");
+                    //    return false;
+                    //}
+                else
+                    //Accepted
+                {
+
+                    var dataObj = JSON.stringify({ conceptInfoId: $("#conceptInfoId").val(), requestId: $("#requestId").val(), roadmap: $("#roadmap").val(), reviewStartDate: $("#reviewStartDate").val(), internalRev: $("#internalRev").val(), externalRev: $("#externalRev").val(), Activities: gridDataArray });
+
+                    // $("#submitBrdFrm").prop("disable", true);
+                    $(':input[type="submit"]').prop('disabled', true);
+                    /*
+                    var fields = $(this).serializeArray();
+                    var activities = compact();
+                    fields.push({ name: 'Activities', value: JSON.stringify(activities) });
+                    */
+                    //console.log(fields);
+
+                    $.ajax({
+                        url: '/Product/SubmitDraftBrd',
+                        type: this.method,
+                        data: dataObj,
+                        //data: dataObj,
+                        cache: false,
+                        dataType: "json",
+                        success: function (result) {
+
+                            if (result.f != null) {
+
+                                swal(result.f, "!", "error");
+
+                            } else {
+                                swal({
+                                    title: "Success!",
+                                    text: result.s,
+                                    type: "success"
+                                });
+                                //  top.location.href = "/";
+                            }
+                        }
+                    });
+                }
+                //Reassign
+            } else if ($(".selectAction").val() === "Reassign") {
+
+                if (reassignedValue === "" || reassignedValue === null) {
+                    swal("Select the person to assign the task to", "Empty Field(s)", "error");
+                    return false;
+                } else {
+                    $(':input[type="submit"]').prop('disabled', true);
+                    $.ajax({
+                        url: '/Product/ReassignDraftBrd',//this.action,
+                        type: this.method,
+                        contentType: 'application/json, charset=utf-8',
+                        data: JSON.stringify({ requestId: requestIdval, assignedTo: reassignedValue, SN: SNval }),
+                        cache: false,
+                        dataType: "json",
+                        success: function (result) {
+
+                            if (result.f != null) {
+
+                                swal(result.f, "!", "error");
+
+                            } else {
+                                swal({
+                                    title: "Success!",
+                                    text: result.s,
+                                    type: "success"
+                                });
+                                top.location.href = "/";
+                            }
+                        }
+                    });
+
+                }
+            } else if ($(".selectAction").val() === "Pause") {
+                $(':input[type="submit"]').prop('disabled', true);
+                $.ajax({
+                    url: '/Product/Paused',//this.action,
+                    type: this.method,
+                    contentType: 'application/json, charset=utf-8',
+                    data: JSON.stringify({ SN: SNval, requestId: requestIdval, ApproverComment: $("#pauseComment").val() }),
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+
+                        if (result.f != null) {
+
+                            swal({
+                                title: "Failed!",
+                                text: result.f,
+                                type: "error"
+                            });
+
+
+                        } else {
+                            swal({
+                                title: "Success!",
+                                text: result.s,
+                                type: "success"
+                            });
+                        }
+                    }
+                });
+            }
+
+
+
+
+            return false;
+        });
+    });
+</script>
+
+
+<script>
+    $(".Reassigned").css("display", "none");
+    $(".chosen-container").css("min-width", "180px");
+    $("#reviewStartDate, #st,#stp").datepicker({
+        dateFormat: 'dd-M-yy'
+    });
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+
+
+    $('.selectAction').on('change', function () {
+        if (this.value === "Reassign") {
+            $("#pauseComment").css("display", "none");
+            disablePage();
+
+            $(".Reassigned").css("display", "block");
+            $(".chosen-container").css("width", "180px");
+
+        } else if (this.value === "Accept") {
+            $("#pauseComment").css("display", "none");
+            enablePage();
+            $(".Reassigned").css("display", "none");
+
+
+        } else if (this.value === "Pause") {
+            $("#pauseComment").css("display", "block");
+            $("#pauseComment").prop("required", true);
+            disablePage();
+        }
+
+
+    });
+
+    function disablePage() {
+
+        $("#reviewStartDate").removeAttr("required", true);
+        $("#roadmap").removeAttr("required", true);
+        $("#internalRev").removeAttr("required", true);
+        $("#externalRev").removeAttr("required", true);
+        $("#conceptInfoId").removeAttr("required", true);
+
+        $("#ReAssignedTo").prop("required", true);
+
+        $(".Reassigned").css("display", "none");
+        $("#rm").css("display", "none");
+        //$("#sla").css("display", "none");
+        $(".reviewStartDate").css("display", "none");
+        $("#sc").css("display", "none");
+        $("#brd").css("display", "none");
+        $(".prodTimeLine").css("display", "none");
+        $("#sfl").css("display", "none");
+
+    }
+
+    function enablePage() {
+        $(".Reassigned").css("display", "block");
+        $("#rm").css("display", "block");
+        //$("#sla").css("display", "block");
+        $(".reviewStartDate").css("display", "block");
+        $("#sc").css("display", "block");
+        $("#brd").css("display", "block");
+        $(".prodTimeLine").css("display", "block");
+        $("#sfl").css("display", "block");
+
+        $("#reviewStartDate").prop("required", true);
+        $("#roadmap").prop("required", true);
+        $("#internalRev").prop("required", true);
+        $("#externalRev").prop("required", true);
+        $("#conceptInfoId").prop("required", true);
+
+        $("#ReAssignedTo").removeAttr("required", true);
+    }
+
+    $(".add-row").click(function () {
+        var activity = $("#ac").val();
+
+        var start = $("#st").val();
+
+        var stop = $("#stp").val();
+
+        if (activity === "" || start === "" || stop === "") {
+            swal("One or more fields is empty!", "Empty Field(s)", "error");
+            return false;
+        }
+
+        var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + activity + "</td><td>" + start + "</td><td>" + stop + "</td></tr>";
+        $("table tbody").append(markup);
+        compact();
+
+        $("#ac").val("");
+        $("#st").val("");
+        $("#stp").val("");
+
+    });
+
+    // Find and remove selected table rows
+    $(".delete-row").click(function () {
+        $("table tbody").find('input[name="record"]').each(function () {
+            if ($(this).is(":checked")) {
+                $(this).parents("tr").remove();
+            }
+        });
+        compact();
+    });
+
+    function compact() {
+        var myRows = [];
+        var $headers = $("#datagrid th");
+        var $rows = $("#datagrid tr").each(function (index) {
+
+            $cells = $(this).find("td");
+            myRows[index] = {};
+            $cells.each(function (cellIndex) {
+                myRows[index][$($headers[cellIndex]).html().split(' ').join('')] = $(this).html();
+            });
+        });
+        var myObj = {};
+        for (var i = 0; i < myRows.length; i++) {
+            delete myRows[i].Action;
+        }
+        for (var ik = 0; ik < myRows.length; ik++) {
+            myRows[ik]['RequestId'] = $('#requestId').val();
+        }
+        delete myRows[0];
+        var data = myRows.filter(function (x) { return x !== null });
+        myObj = data;
+        console.log(data);
+        return myObj;
+    }
+
+
+
+    $('#roadmap').on('change', function () {
+        $('#conceptInfoId').empty();
+        if (this.value !== "000") {
+            //var request = this.value;
+            $.ajax({
+                type: "GET",
+                url: 'http://localhost:8011/api/RoadMapsApi/' + this.value + '/master/',
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    if (result.length !== 0) {
+                        for (var i = 0; i < result.length; i++) {
+                            $('#conceptInfoId').append('<option value="' + result[i].Id + '">' + result[i].ConceptName + '</option>');
+                        }
+                        $('#conceptInfoId').val('').trigger('chosen:updated');
+                    }
+                },
+                error: function (error) {
+                }
+            });
+        }
+    });
+
+    $('#actionHistoryTable').DataTable();
+    $('#attachedDocsTable').DataTable();
+
+</script>
+<script>
+
+    $(".chosen-select").chosen({ no_results_text: "Oops, nothing found!" }, { max_selected_options: 5 }, { width: "30%" });
+    $(".chosen-container").css("width", "180px");
+</script>
